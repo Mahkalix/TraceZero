@@ -16,7 +16,7 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
 
   await page
     .getByRole("button", {
-      name: /ACTION REQUISE.*security@helix-support\.example/s,
+      name: /ACTION REQUISE/,
     })
     .click();
 
