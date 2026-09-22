@@ -37,7 +37,7 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
   await expect(page.getByText("Session réutilisée")).toBeVisible();
   await expect(page.getByText("Connexion simultanée")).toBeVisible();
 
-  await page.getByRole("button", { name: "Terminal" }).click();
+  await page.getByRole("button", { name: "Terminal", exact: true }).click();
   const input = page.getByLabel("judy@trace ~ %");
 
   await input.fill("ls");
@@ -49,13 +49,13 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
   await expect(page.getByText("MISMATCH: reference hash differs")).toBeVisible();
   await expect(page.getByText("Empreinte divergente", { exact: true }).first()).toBeVisible();
 
-  await page.getByRole("button", { name: "Dossier" }).click();
+  await page.getByRole("button", { name: "Dossier", exact: true }).click();
   await expect(page.getByText("Piste technique consolidée")).toBeVisible();
 
-  await page.getByRole("button", { name: "Fichiers" }).click();
+  await page.getByRole("button", { name: "Fichiers", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Fichiers" })).toBeVisible();
 
-  await page.getByRole("button", { name: "Timeline" }).click();
+  await page.getByRole("button", { name: "Timeline", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Timeline" })).toBeVisible();
   await expect(page.getByText("Empreinte divergente", { exact: true })).toBeVisible();
 });
