@@ -1,6 +1,14 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import {
+  FormEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type PointerEvent,
+} from "react";
 import { evidenceCatalog } from "@/data/chapter-01/evidence";
 import { emails, phishingEmailId } from "@/data/chapter-01/emails";
 import { sessionEvents } from "@/data/chapter-01/network";
@@ -24,20 +32,10 @@ type ActiveApp =
   | "files"
   | "timeline";
 
+type WindowKey = ActiveApp | "notes";
 type NotebookTab = "evidence" | "hypotheses";
 
-type TerminalLine = {
-  id: number;
-  command?: string;
-  output?: string;
-};
-
-type WindowKey = "app" | "notes";
-
-type WindowPosition = {
-  x: number;
-  y: number;
-};
+type WindowPosition = { x: number; y: number };
 
 type DragSession = {
   key: WindowKey;
@@ -46,16 +44,22 @@ type DragSession = {
   startY: number;
   originX: number;
   originY: number;
+  nextX: number;
+  nextY: number;
+  raf: number | null;
 };
 
-const signalLabels: Record<PhishingSignal, string> = {
-  sender: "expéditeur externe",
-  domain: "domaine ressemblant",
-  link: "destination réelle différente",
-  urgency: "pression temporelle",
+type TerminalLine = {
+  id: number;
+  command?: string;
+  output?: string;
 };
 
-const dockApps: Array<{
+const judyPortrait =
+  "https://1.bp.blogspot.com/-YF9OOw5rB-U/X9tAimobl0I/AAAAAAAAGEU/t1PHyHLWS_sz09PM7YustUT6GJJDsaKbACPcBGAsYHg/w914-h514-p-k-no-nu/judy-alvarez-cyberpunk-2077-uhdpaper.com-4K-8.2294-wp.thumbnail.jpg";
+const judyWallpaper = "/judy-apartment.jpg";
+
+const apps: Array<{
   id: ActiveApp;
   label: string;
   glyph: string;
@@ -69,41 +73,58 @@ const dockApps: Array<{
   { id: "timeline", label: "Timeline", glyph: "⌇", code: "06" },
 ];
 
-const judyPortrait =
-  "https://1.bp.blogspot.com/-YF9OOw5rB-U/X9tAimobl0I/AAAAAAAAGEU/t1PHyHLWS_sz09PM7YustUT6GJJDsaKbACPcBGAsYHg/w914-h514-p-k-no-nu/judy-alvarez-cyberpunk-2077-uhdpaper.com-4K-8.2294-wp.thumbnail.jpg";
-const judyWallpaper = "/judy-apartment.jpg";
-
 const defaultWindowPositions: Record<WindowKey, WindowPosition> = {
-  app: { x: 0, y: 0 },
+  case: { x: 0, y: 0 },
+  mail: { x: 54, y: 22 },
+  network: { x: 92, y: 42 },
+  terminal: { x: 124, y: 64 },
+  files: { x: 78, y: 34 },
+  timeline: { x: 108, y: 54 },
   notes: { x: 0, y: 0 },
 };
 
+const signalLabels: Record<PhishingSignal, string> = {
+  sender: "expéditeur externe",
+  domain: "domaine ressemblant",
+  link: "destination réelle différente",
+  urgency: "pression temporelle",
+};
+
 export function InvestigationDesktop({ caseId }: { caseId: string }) {
+  const [openApps, setOpenApps] = useState<ActiveApp[]>(["case"]);
+  const [minimizedApps, setMinimizedApps] = useState<ActiveApp[]>([]);
   const [activeApp, setActiveApp] = useState<ActiveApp>("case");
   const [selectedEmailId, setSelectedEmailId] = useState(emails[0].id);
   const [analysisOpen, setAnalysisOpen] = useState(false);
   const [signals, setSignals] = useState<PhishingSignal[]>([]);
   const [notebookTab, setNotebookTab] = useState<NotebookTab>("evidence");
-  const [notesOpen, setNotesOpen] = useState(true);
+  const [notesOpen, setNotesOpen] = useState(false);
   const [progress, setProgress] =
     useState<InvestigationProgress>(initialProgress);
   const [hydrated, setHydrated] = useState(false);
   const [announcement, setAnnouncement] = useState("");
-  const [terminalInput, setTerminalInput] = useState("");
   const [windowPositions, setWindowPositions] =
     useState<Record<WindowKey, WindowPosition>>(defaultWindowPositions);
   const [windowLayers, setWindowLayers] = useState<Record<WindowKey, number>>({
-    app: 4,
-    notes: 6,
+    case: 5,
+    mail: 6,
+    network: 7,
+    terminal: 8,
+    files: 9,
+    timeline: 10,
+    notes: 20,
   });
-  const topLayerRef = useRef(6);
-  const dragRef = useRef<DragSession | null>(null);
+  const [terminalInput, setTerminalInput] = useState("");
   const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([
     {
       id: 1,
       output: "TRACE forensic shell / simulated environment / read only",
     },
   ]);
+
+  const windowRefs = useRef<Partial<Record<WindowKey, HTMLElement | null>>>({});
+  const dragRef = useRef<DragSession | null>(null);
+  const topLayerRef = useRef(20);
 
   useEffect(() => {
     setProgress(readProgress());
@@ -122,46 +143,89 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   const discovered = new Set(progress.discoveredEvidenceIds);
   const hasPhishingEvidence = discovered.has("E01") && discovered.has("E02");
   const hasNetworkEvidence = discovered.has("E03") && discovered.has("E04");
+  const hasArchiveEvidence = discovered.has("E05");
+  const hasHashEvidence = discovered.has("E06");
   const hypothesisValidated = progress.validatedHypothesisIds.includes("H01");
+  const caseComplete = hasHashEvidence;
 
   function focusWindow(key: WindowKey) {
     topLayerRef.current += 1;
-    const nextLayer = topLayerRef.current;
-    setWindowLayers((current) => ({ ...current, [key]: nextLayer }));
+    const layer = topLayerRef.current;
+    setWindowLayers((current) => ({ ...current, [key]: layer }));
+
+    if (key !== "notes") setActiveApp(key);
+  }
+
+  function openApp(app: ActiveApp) {
+    setOpenApps((current) =>
+      current.includes(app) ? current : [...current, app],
+    );
+    setMinimizedApps((current) => current.filter((item) => item !== app));
+    focusWindow(app);
+    setAnnouncement(`${apps.find((item) => item.id === app)?.label} ouvert.`);
+  }
+
+  function minimizeApp(app: ActiveApp) {
+    setMinimizedApps((current) =>
+      current.includes(app) ? current : [...current, app],
+    );
+    setAnnouncement(`${apps.find((item) => item.id === app)?.label} réduit.`);
+  }
+
+  function closeApp(app: ActiveApp) {
+    if (app === "case") {
+      minimizeApp(app);
+      return;
+    }
+
+    setOpenApps((current) => current.filter((item) => item !== app));
+    setMinimizedApps((current) => current.filter((item) => item !== app));
   }
 
   function resetDesktopLayout() {
     setWindowPositions(defaultWindowPositions);
-    setWindowLayers({ app: 4, notes: 6 });
-    topLayerRef.current = 6;
-    setAnnouncement("Disposition du bureau réinitialisée.");
+    setOpenApps(["case"]);
+    setMinimizedApps([]);
+    setNotesOpen(false);
+    setActiveApp("case");
+    topLayerRef.current = 20;
+
+    Object.entries(defaultWindowPositions).forEach(([key, position]) => {
+      const element = windowRefs.current[key as WindowKey];
+      if (element) {
+        element.style.transform = `translate3d(${position.x}px, ${position.y}px, 0)`;
+      }
+    });
+
+    setAnnouncement("Bureau remis en place.");
   }
 
-  function updateWindowPosition(
-    key: WindowKey,
-    next: WindowPosition,
-  ) {
-    const xLimit = typeof window === "undefined"
-      ? 360
-      : Math.max(120, Math.round(window.innerWidth * 0.32));
-    const yLimit = typeof window === "undefined"
-      ? 180
-      : Math.max(90, Math.round(window.innerHeight * 0.2));
+  function clampPosition(position: WindowPosition) {
+    if (typeof window === "undefined") return position;
 
-    setWindowPositions((current) => ({
-      ...current,
-      [key]: {
-        x: Math.max(-xLimit, Math.min(xLimit, next.x)),
-        y: Math.max(-yLimit, Math.min(yLimit, next.y)),
-      },
-    }));
+    const xLimit = Math.max(120, Math.round(window.innerWidth * 0.34));
+    const yLimit = Math.max(90, Math.round(window.innerHeight * 0.24));
+
+    return {
+      x: Math.max(-xLimit, Math.min(xLimit, position.x)),
+      y: Math.max(-yLimit, Math.min(yLimit, position.y)),
+    };
+  }
+
+  function paintWindowPosition(key: WindowKey, position: WindowPosition) {
+    const element = windowRefs.current[key];
+    if (element) {
+      element.style.transform = `translate3d(${position.x}px, ${position.y}px, 0)`;
+    }
   }
 
   function beginWindowDrag(
     key: WindowKey,
     event: PointerEvent<HTMLElement>,
   ) {
-    if (event.button !== 0) return;
+    if (event.button !== 0 || window.matchMedia("(max-width: 58rem)").matches) {
+      return;
+    }
 
     focusWindow(key);
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -174,6 +238,9 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       startY: event.clientY,
       originX: origin.x,
       originY: origin.y,
+      nextX: origin.x,
+      nextY: origin.y,
+      raf: null,
     };
   }
 
@@ -181,45 +248,73 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     const drag = dragRef.current;
     if (!drag || drag.pointerId !== event.pointerId) return;
 
-    updateWindowPosition(drag.key, {
+    const next = clampPosition({
       x: drag.originX + event.clientX - drag.startX,
       y: drag.originY + event.clientY - drag.startY,
+    });
+
+    drag.nextX = next.x;
+    drag.nextY = next.y;
+
+    if (drag.raf !== null) return;
+
+    drag.raf = window.requestAnimationFrame(() => {
+      const current = dragRef.current;
+      if (!current) return;
+      paintWindowPosition(current.key, {
+        x: current.nextX,
+        y: current.nextY,
+      });
+      current.raf = null;
     });
   }
 
   function endWindowDrag(event: PointerEvent<HTMLElement>) {
-    if (dragRef.current?.pointerId === event.pointerId) {
-      dragRef.current = null;
+    const drag = dragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+
+    if (drag.raf !== null) {
+      window.cancelAnimationFrame(drag.raf);
+      paintWindowPosition(drag.key, { x: drag.nextX, y: drag.nextY });
     }
+
+    setWindowPositions((current) => ({
+      ...current,
+      [drag.key]: { x: drag.nextX, y: drag.nextY },
+    }));
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
+
+    dragRef.current = null;
   }
 
   function moveWindowWithKeyboard(
     key: WindowKey,
     event: KeyboardEvent<HTMLElement>,
   ) {
-    const offsets: Record<string, WindowPosition> = {
+    const vector: Record<string, WindowPosition> = {
       ArrowLeft: { x: -1, y: 0 },
       ArrowRight: { x: 1, y: 0 },
       ArrowUp: { x: 0, y: -1 },
       ArrowDown: { x: 0, y: 1 },
     };
 
-    const offset = offsets[event.key];
-    if (!offset) return;
+    const direction = vector[event.key];
+    if (!direction) return;
 
     event.preventDefault();
     focusWindow(key);
     const step = event.shiftKey ? 48 : 16;
     const current = windowPositions[key];
-
-    updateWindowPosition(key, {
-      x: current.x + offset.x * step,
-      y: current.y + offset.y * step,
+    const next = clampPosition({
+      x: current.x + direction.x * step,
+      y: current.y + direction.y * step,
     });
+
+    setWindowPositions((positions) => ({ ...positions, [key]: next }));
+    paintWindowPosition(key, next);
   }
 
   function addEvidence(ids: string[]) {
@@ -231,15 +326,9 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     }));
   }
 
-  function openApp(app: ActiveApp) {
-    setActiveApp(app);
-    setAnnouncement(`${dockApps.find((item) => item.id === app)?.label} ouvert.`);
-  }
-
   function startInvestigation() {
     openApp("mail");
     setProgress((current) => ({ ...current, currentStep: "mail" }));
-    setAnnouncement("Messagerie de Judy ouverte.");
   }
 
   function toggleSignal(signal: PhishingSignal) {
@@ -252,21 +341,22 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
 
   function validateAnalysis() {
     if (selectedEmail.id !== phishingEmailId) {
-      setAnnouncement("Ce message ne révèle pas suffisamment d'indices.");
+      setAnnouncement("Rien de suffisamment anormal sur ce message.");
       return;
     }
 
     const result = analyzePhishingSignals(signals);
 
     if (!result.isEnough) {
-      setAnnouncement("Analyse incomplète. Deux indices minimum.");
+      setAnnouncement("Deux indices sont nécessaires.");
       return;
     }
 
     addEvidence(result.evidenceIds);
     setNotebookTab("evidence");
     setNotesOpen(true);
-    setAnnouncement("E01 et E02 ajoutées au carnet.");
+    focusWindow("notes");
+    setAnnouncement("Deux preuves ont été ajoutées au carnet.");
   }
 
   function validateHypothesis() {
@@ -276,14 +366,16 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       ...current,
       validatedHypothesisIds: [...current.validatedHypothesisIds, "H01"],
     }));
-    setAnnouncement("H01 validée. Le réseau devient prioritaire.");
+    setAnnouncement("Phishing ciblé confirmé. Vérifiez maintenant le réseau.");
+    openApp("network");
   }
 
   function compareSessions() {
     addEvidence(["E03", "E04"]);
     setNotebookTab("evidence");
     setNotesOpen(true);
-    setAnnouncement("E03 et E04 ajoutées au carnet.");
+    focusWindow("notes");
+    setAnnouncement("La session de Judy a été réutilisée sur une autre machine.");
   }
 
   function submitTerminal(event: FormEvent<HTMLFormElement>) {
@@ -301,78 +393,71 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
 
     setTerminalLines((current) => {
       const nextId = current.length ? current[current.length - 1].id + 1 : 1;
-      const additions: TerminalLine[] = [
+      return [
+        ...current,
         { id: nextId, command },
         ...result.output.map((output, index) => ({
           id: nextId + index + 1,
           output,
         })),
       ];
-      return [...current, ...additions];
     });
 
     if (result.evidenceIds?.length) {
       addEvidence(result.evidenceIds);
+      setNotebookTab("evidence");
       setNotesOpen(true);
       setAnnouncement(
-        `${result.evidenceIds.join(" + ")} ajoutée(s) au carnet.`,
+        result.evidenceIds.includes("E06")
+          ? "Empreinte divergente confirmée. Le dossier peut être consolidé."
+          : "Archive ORION identifiée.",
       );
     }
   }
 
   function renderCase() {
     return (
-      <section className="personal-home" aria-labelledby="case-brief-title">
-        <div className="personal-home__identity">
-          <div className="personal-home__portrait">
-            <img src={judyPortrait} alt="" />
-          </div>
-
-          <div className="personal-home__copy">
-            <span className="micro-label">USER PROFILE / LOCAL DEVICE</span>
-            <h2 id="case-brief-title">Judy Alvarez</h2>
-            <p>
-              Dernière activité locale détectée à 22:44. Le poste est figé dans
-              une copie forensic en lecture seule.
-            </p>
-
-            <div className="identity-stats">
-              <div>
-                <span>DEVICE</span>
-                <strong>JUDY-LAPTOP</strong>
-              </div>
-              <div>
-                <span>PROJECT</span>
-                <strong>ORION</strong>
-              </div>
-              <div>
-                <span>STATE</span>
-                <strong>OFFLINE / 36H</strong>
-              </div>
-            </div>
-
-            <button className="soft-button" type="button" onClick={startInvestigation}>
-              Commencer par les messages
-            </button>
-          </div>
+      <section className="case-home" aria-labelledby="case-title">
+        <div className="case-home__portrait">
+          <img src={judyPortrait} alt="" />
         </div>
 
-        <div className="personal-home__cards">
-          <article>
-            <span className="micro-label">RECENT</span>
-            <strong>6 messages</strong>
-            <p>Dernière réception · 22:18</p>
-          </article>
-          <article>
-            <span className="micro-label">SESSION</span>
-            <strong>S-4831</strong>
-            <p>Dernier jeton actif</p>
-          </article>
-          <article>
-            <span className="micro-label">INTEGRITY</span>
-            <strong>VERIFIED</strong>
-            <p>Image disque en lecture seule</p>
-          </article>
+        <div className="case-home__content">
+          <span className="micro-label">
+            {caseComplete ? "CASE 001 / TRACE COMPLETE" : "CASE 001 / START HERE"}
+          </span>
+          <h2 id="case-title">Judy Alvarez</h2>
+
+          {caseComplete ? (
+            <>
+              <p>
+                La compromission est établie : phishing ciblé, réutilisation de
+                session puis export ORION dont l’empreinte ne correspond pas à
+                la référence de Judy.
+              </p>
+              <div className="case-result">
+                <span>6 preuves vérifiées</span>
+                <strong>Piste technique consolidée</strong>
+              </div>
+              <button className="soft-button" type="button" onClick={() => openApp("timeline")}>
+                Voir la chronologie
+              </button>
+            </>
+          ) : (
+            <>
+              <p>
+                Judy a disparu il y a 36 heures. Commencez simplement par
+                regarder ses derniers messages.
+              </p>
+              <div className="case-home__meta">
+                <span>Dernière activité · 22:44</span>
+                <span>Copie en lecture seule</span>
+              </div>
+              <button className="soft-button" type="button" onClick={startInvestigation}>
+                Ouvrir Messages
+              </button>
+            </>
+          )}
         </div>
       </section>
     );
@@ -383,9 +468,8 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       <section className="mail-space" aria-labelledby="mail-subject">
         <aside className="mail-space__sidebar" aria-label="Boîte de réception">
           <div className="space-sidebar__heading">
-            <span className="micro-label">MAIL</span>
             <strong>Messages</strong>
-            <small>{emails.length} éléments</small>
+            <small>{emails.length} conversations</small>
           </div>
 
           <div className="mail-space__list">
@@ -408,7 +492,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                   <strong>{email.subject}</strong>
                   <small>{email.from}</small>
                 </span>
-                <time>{email.date.split("·")[1]?.trim() ?? email.date}</time>
               </button>
             ))}
           </div>
@@ -420,32 +503,22 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
               <span className="micro-label">{selectedEmail.date}</span>
               <h2 id="mail-subject">{selectedEmail.subject}</h2>
             </div>
-            {selectedEmail.external ? (
-              <span className="status-pill">EXTERNAL</span>
-            ) : null}
+            {selectedEmail.external ? <span className="status-pill">EXTERNAL</span> : null}
           </header>
 
           <dl className="mail-space__meta">
-            <div><dt>From</dt><dd>{selectedEmail.from}</dd></div>
-            <div><dt>To</dt><dd>{selectedEmail.to}</dd></div>
+            <div><dt>De</dt><dd>{selectedEmail.from}</dd></div>
+            <div><dt>À</dt><dd>{selectedEmail.to}</dd></div>
           </dl>
 
           <div className="mail-space__body">
-            {selectedEmail.body.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
+            {selectedEmail.body.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
 
             {selectedEmail.displayLink ? (
               <div className="link-inspector">
-                <span className="micro-label">LINK INSPECTOR</span>
-                <div>
-                  <span>displayed</span>
-                  <strong>{selectedEmail.displayLink}</strong>
-                </div>
-                <div>
-                  <span>resolved</span>
-                  <code>{selectedEmail.actualLink}</code>
-                </div>
+                <span className="micro-label">Lien détecté</span>
+                <div><span>affiché</span><strong>{selectedEmail.displayLink}</strong></div>
+                <div><span>réel</span><code>{selectedEmail.actualLink}</code></div>
               </div>
             ) : null}
           </div>
@@ -460,21 +533,14 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
             >
               Analyser ce message
             </button>
-            <button className="ghost-button" type="button" onClick={() => setNotesOpen(true)}>
-              Ouvrir le carnet
-            </button>
           </div>
 
           {analysisOpen ? (
-            <section
-              className="analysis-sheet"
-              id="analysis-panel"
-              aria-labelledby="analysis-title"
-            >
+            <section className="analysis-sheet" id="analysis-panel" aria-labelledby="analysis-title">
               <header>
                 <div>
-                  <span className="micro-label">FORENSIC ASSIST</span>
-                  <h3 id="analysis-title">Qu’est-ce qui cloche ?</h3>
+                  <span className="micro-label">Analyse</span>
+                  <h3 id="analysis-title">Quels signaux sont suspects ?</h3>
                 </div>
                 <span>{signals.length}/4</span>
               </header>
@@ -509,14 +575,19 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     if (!hypothesisValidated) {
       return (
         <section className="empty-app">
-          <span className="micro-label">NETWORK</span>
-          <h2>Le contexte manque.</h2>
-          <p>Validez d’abord H01 dans le carnet pour interpréter ces sessions.</p>
-          <button className="soft-button" type="button" onClick={() => {
-            setNotebookTab("hypotheses");
-            setNotesOpen(true);
-          }}>
-            Ouvrir les hypothèses
+          <span className="micro-label">Réseau</span>
+          <h2>Pas encore.</h2>
+          <p>Le réseau ne devient pertinent qu’après avoir confirmé l’hypothèse de phishing.</p>
+          <button
+            className="soft-button"
+            type="button"
+            onClick={() => {
+              setNotebookTab("hypotheses");
+              setNotesOpen(true);
+              focusWindow("notes");
+            }}
+          >
+            Ouvrir l’hypothèse
           </button>
         </section>
       );
@@ -526,23 +597,21 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       <section className="network-space" aria-labelledby="network-title">
         <header className="app-heading">
           <div>
-            <span className="micro-label">AUTHENTICATION TRACE</span>
-            <h2 id="network-title">Session S-4831</h2>
+            <span className="micro-label">Session d’authentification</span>
+            <h2 id="network-title">S-4831</h2>
           </div>
-          <span className="status-pill status-pill--warning">2 DEVICES</span>
+          <span className="status-pill status-pill--warning">2 appareils</span>
         </header>
 
-        <div className="session-map" aria-label="Comparaison des sessions">
+        <div className="session-map">
           <article className="session-node">
-            <span className="micro-label">KNOWN DEVICE</span>
+            <span className="micro-label">Connu</span>
             <strong>JUDY-LAPTOP</strong>
             <small>10.24.16.12</small>
           </article>
-          <div className="session-link" aria-hidden="true">
-            <span>S-4831</span>
-          </div>
+          <div className="session-link"><span>S-4831</span></div>
           <article className="session-node session-node--unknown">
-            <span className="micro-label">UNKNOWN DEVICE</span>
+            <span className="micro-label">Inconnu</span>
             <strong>UNKNOWN-WIN</strong>
             <small>198.51.100.73</small>
           </article>
@@ -560,7 +629,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
         </div>
 
         <button className="soft-button" type="button" onClick={compareSessions}>
-          Comparer les sessions
+          Confirmer l’anomalie
         </button>
       </section>
     );
@@ -570,9 +639,9 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     if (!hasNetworkEvidence) {
       return (
         <section className="empty-app">
-          <span className="micro-label">TERMINAL</span>
+          <span className="micro-label">Terminal</span>
           <h2>Shell verrouillé.</h2>
-          <p>Confirmez d’abord l’anomalie de session dans Réseau.</p>
+          <p>Confirmez l’anomalie réseau avant de fouiller les fichiers.</p>
           <button className="soft-button" type="button" onClick={() => openApp("network")}>
             Ouvrir Réseau
           </button>
@@ -584,7 +653,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       <section className="terminal-space" aria-labelledby="terminal-title">
         <header className="app-heading">
           <div>
-            <span className="micro-label">SIMULATED SHELL / READ ONLY</span>
+            <span className="micro-label">Sandbox / lecture seule</span>
             <h2 id="terminal-title">Terminal</h2>
           </div>
         </header>
@@ -613,34 +682,152 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
           />
           <button type="submit">Run</button>
         </form>
-
         <p id="terminal-hint" className="terminal-hint">
-          Essayez <code>help</code>, puis <code>ls</code>.
+          Commencez par <code>help</code>, puis <code>ls</code>.
         </p>
       </section>
     );
   }
 
-  function renderPlaceholder(title: string) {
+  function renderFiles() {
+    const rows = [
+      { name: "notes.txt", meta: "1 KB · texte" },
+      { name: "reference.sha256", meta: "96 B · empreinte" },
+      { name: "orion-export.zip", meta: "418 MB · archive", suspect: true },
+      { name: "auth.log", meta: "24 KB · journal" },
+    ];
+
     return (
-      <section className="empty-app">
-        <span className="micro-label">APP</span>
-        <h2>{title}</h2>
-        <p>Cette application n’est pas encore nécessaire pour cette enquête.</p>
+      <section className="files-space" aria-labelledby="files-title">
+        <header className="app-heading">
+          <div>
+            <span className="micro-label">Récents</span>
+            <h2 id="files-title">Fichiers</h2>
+          </div>
+        </header>
+
+        <div className="file-list">
+          {rows.map((row) => (
+            <button
+              className="file-row"
+              data-suspect={row.suspect || undefined}
+              key={row.name}
+              type="button"
+              onClick={() => {
+                if (row.name === "orion-export.zip") openApp("terminal");
+              }}
+            >
+              <span className="file-row__icon" aria-hidden="true">□</span>
+              <strong>{row.name}</strong>
+              <small>{row.meta}</small>
+              {row.suspect ? <em>{hasArchiveEvidence ? "identifiée" : "à vérifier"}</em> : null}
+            </button>
+          ))}
+        </div>
+
+        <p className="files-hint">
+          L’archive ORION mérite une vérification d’intégrité dans le Terminal.
+        </p>
       </section>
     );
   }
 
-  function renderActiveWindow() {
-    if (activeApp === "case") return renderCase();
-    if (activeApp === "mail") return renderMail();
-    if (activeApp === "network") return renderNetwork();
-    if (activeApp === "terminal") return renderTerminal();
-    if (activeApp === "files") return renderPlaceholder("Fichiers");
-    return renderPlaceholder("Timeline");
+  function renderTimeline() {
+    const items = [
+      { time: "21:36", title: "Dernière présence confirmée", detail: "Judy quitte Helix Systems.", active: true },
+      { time: "22:18", title: "Message externe reçu", detail: "Alerte de sécurité ORION.", active: hasPhishingEvidence },
+      { time: "22:44", title: "Session S-4831 réutilisée", detail: "UNKNOWN-WIN reprend le jeton.", active: hasNetworkEvidence },
+      { time: "22:45", title: "Export ORION téléchargé", detail: "orion-export.zip apparaît sur le poste.", active: hasArchiveEvidence },
+      { time: "22:46", title: "Empreinte divergente", detail: "Le SHA-256 ne correspond pas à la référence.", active: hasHashEvidence },
+    ];
+
+    return (
+      <section className="timeline-space" aria-labelledby="timeline-title">
+        <header className="app-heading">
+          <div>
+            <span className="micro-label">Reconstruction</span>
+            <h2 id="timeline-title">Timeline</h2>
+          </div>
+        </header>
+
+        <ol className="timeline-list">
+          {items.map((item) => (
+            <li data-active={item.active} key={item.time + item.title}>
+              <time>{item.time}</time>
+              <div>
+                <strong>{item.title}</strong>
+                <p>{item.active ? item.detail : "Non vérifié"}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+    );
   }
 
-  const activeMeta = dockApps.find((app) => app.id === activeApp) ?? dockApps[0];
+  function renderApp(app: ActiveApp) {
+    if (app === "case") return renderCase();
+    if (app === "mail") return renderMail();
+    if (app === "network") return renderNetwork();
+    if (app === "terminal") return renderTerminal();
+    if (app === "files") return renderFiles();
+    return renderTimeline();
+  }
+
+  function renderWindow(app: ActiveApp) {
+    const meta = apps.find((item) => item.id === app) ?? apps[0];
+    const position = windowPositions[app];
+    const minimized = minimizedApps.includes(app);
+
+    if (minimized) return null;
+
+    return (
+      <div
+        className="app-window draggable-window"
+        data-app={app}
+        key={app}
+        ref={(node) => { windowRefs.current[app] = node; }}
+        onPointerDown={() => focusWindow(app)}
+        style={{
+          transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
+          zIndex: windowLayers[app],
+        }}
+      >
+        <header
+          className="app-window__chrome window-drag-handle"
+          tabIndex={0}
+          aria-label={`Déplacer la fenêtre ${meta.label}. Flèches du clavier disponibles.`}
+          onPointerDown={(event) => beginWindowDrag(app, event)}
+          onPointerMove={moveWindowDrag}
+          onPointerUp={endWindowDrag}
+          onPointerCancel={endWindowDrag}
+          onKeyDown={(event) => moveWindowWithKeyboard(app, event)}
+        >
+          <div className="window-controls">
+            <button
+              type="button"
+              aria-label={`Fermer ${meta.label}`}
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={() => closeApp(app)}
+            />
+            <button
+              type="button"
+              aria-label={`Réduire ${meta.label}`}
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={() => minimizeApp(app)}
+            />
+            <span aria-hidden="true" />
+          </div>
+          <div className="app-window__identity">
+            <span>{meta.glyph}</span>
+            <strong>{meta.label}</strong>
+          </div>
+          <span className="app-window__code">{meta.code}</span>
+        </header>
+        <div className="app-window__body">{renderApp(app)}</div>
+      </div>
+    );
+  }
 
   return (
     <main className="judy-os" id="main-content">
@@ -653,27 +840,24 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
         <div className="os-menubar__left">
           <span className="os-mark" aria-hidden="true">TZ</span>
           <strong>JUDY-LAPTOP</strong>
-          <span>forensic mirror</span>
         </div>
         <div className="os-menubar__center">
-          <span>case {caseId}</span>
-          <span>read only</span>
+          <span>{caseComplete ? "trace complete" : "case 001"}</span>
         </div>
         <div className="os-menubar__right">
-          <button
-            type="button"
-            className="layout-reset"
-            onClick={resetDesktopLayout}
-          >
-            Réinitialiser
+          <button className="layout-reset" type="button" onClick={resetDesktopLayout}>
+            Ranger
           </button>
           <button
             type="button"
             className="notes-toggle"
             aria-pressed={notesOpen}
-            onClick={() => setNotesOpen((open) => !open)}
+            onClick={() => {
+              setNotesOpen((open) => !open);
+              if (!notesOpen) focusWindow("notes");
+            }}
           >
-            Notes {progress.discoveredEvidenceIds.length}/6
+            Carnet {progress.discoveredEvidenceIds.length}/6
           </button>
           <span className="os-status-dot" aria-hidden="true" />
         </div>
@@ -681,79 +865,13 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
 
       <section className="os-stage" aria-label="Bureau de Judy">
         <div className="window-stack">
-          <div
-            className="app-window draggable-window"
-            data-app={activeApp}
-            onPointerDown={() => focusWindow("app")}
-            style={{
-              transform: `translate3d(${windowPositions.app.x}px, ${windowPositions.app.y}px, 0)`,
-              zIndex: windowLayers.app,
-            }}
-          >
-            <header
-              className="app-window__chrome window-drag-handle"
-              tabIndex={0}
-              aria-label={`Déplacer la fenêtre ${activeMeta.label}. Utilisez les flèches du clavier ou faites glisser.`}
-              onPointerDown={(event) => beginWindowDrag("app", event)}
-              onPointerMove={moveWindowDrag}
-              onPointerUp={endWindowDrag}
-              onPointerCancel={endWindowDrag}
-              onKeyDown={(event) => moveWindowWithKeyboard("app", event)}
-            >
-              <div className="window-controls" aria-hidden="true">
-                <span />
-                <span />
-                <span />
-              </div>
-              <div className="app-window__identity">
-                <span>{activeMeta.glyph}</span>
-                <strong>{activeMeta.label}</strong>
-              </div>
-              <span className="app-window__code">{activeMeta.code}</span>
-            </header>
-
-            <div className="app-window__body">{renderActiveWindow()}</div>
-          </div>
-
-          <aside className="profile-float" aria-label="Profil utilisateur">
-            <img src={judyPortrait} alt="" />
-            <div>
-              <span className="micro-label">OWNER</span>
-              <strong>Judy Alvarez</strong>
-              <small>last seen 36h ago</small>
-            </div>
-          </aside>
-
-          <button
-            className="desktop-artifact desktop-artifact--file"
-            type="button"
-            onClick={() => openApp("files")}
-          >
-            <span className="desktop-artifact__icon" aria-hidden="true">□</span>
-            <span>
-              <small>RECENT FILE</small>
-              <strong>orion-export.zip</strong>
-              <em>22:43 · 418 MB</em>
-            </span>
-          </button>
-
-          <button
-            className="desktop-artifact desktop-artifact--memo"
-            type="button"
-            onClick={() => openApp("mail")}
-          >
-            <span className="desktop-artifact__icon" aria-hidden="true">@</span>
-            <span>
-              <small>UNREAD</small>
-              <strong>security@helix-support</strong>
-              <em>session ORION expirée</em>
-            </span>
-          </button>
+          {openApps.map(renderWindow)}
 
           {notesOpen ? (
             <aside
               className="notes-inspector draggable-window"
               aria-labelledby="notebook-title"
+              ref={(node) => { windowRefs.current.notes = node; }}
               onPointerDown={() => focusWindow("notes")}
               style={{
                 transform: `translate3d(${windowPositions.notes.x}px, ${windowPositions.notes.y}px, 0)`,
@@ -763,7 +881,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
               <header
                 className="notes-inspector__header window-drag-handle"
                 tabIndex={0}
-                aria-label="Déplacer le carnet. Utilisez les flèches du clavier ou faites glisser."
+                aria-label="Déplacer le carnet. Flèches du clavier disponibles."
                 onPointerDown={(event) => beginWindowDrag("notes", event)}
                 onPointerMove={moveWindowDrag}
                 onPointerUp={endWindowDrag}
@@ -771,10 +889,15 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                 onKeyDown={(event) => moveWindowWithKeyboard("notes", event)}
               >
                 <div>
-                  <span className="micro-label">CASE MEMORY</span>
+                  <span className="micro-label">Mémoire du dossier</span>
                   <strong id="notebook-title">Carnet</strong>
                 </div>
-                <button type="button" onClick={() => setNotesOpen(false)} aria-label="Fermer le carnet">
+                <button
+                  type="button"
+                  onPointerDown={(event) => event.stopPropagation()}
+                  onClick={() => setNotesOpen(false)}
+                  aria-label="Fermer le carnet"
+                >
                   ×
                 </button>
               </header>
@@ -801,7 +924,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
               {notebookTab === "evidence" ? (
                 <div className="notes-list" role="tabpanel">
                   {progress.discoveredEvidenceIds.length === 0 ? (
-                    <p className="notes-empty">Aucune preuve vérifiée.</p>
+                    <p className="notes-empty">Aucune preuve pour l’instant.</p>
                   ) : (
                     progress.discoveredEvidenceIds.map((id) => {
                       const evidence = evidenceCatalog[id];
@@ -821,9 +944,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                   <article className="note-card note-card--hypothesis">
                     <span>H01</span>
                     <strong>Phishing ciblé</strong>
-                    <p>
-                      Judy a reçu un message conçu pour capturer sa session ORION.
-                    </p>
+                    <p>Le message externe a servi à capturer la session ORION de Judy.</p>
                     <button
                       className="soft-button soft-button--small"
                       disabled={!hasPhishingEvidence || hypothesisValidated}
@@ -841,25 +962,25 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       </section>
 
       <nav className="os-dock" aria-label="Applications de Judy">
-        {dockApps.map((app) => (
-          <button
-            aria-label={app.label}
-            aria-pressed={activeApp === app.id}
-            className="dock-app"
-            data-active={activeApp === app.id}
-            key={app.id}
-            onClick={() => openApp(app.id)}
-            type="button"
-          >
-            <span className="dock-app__glyph" aria-hidden="true">{app.glyph}</span>
-            <span className="dock-app__label">{app.label}</span>
-          </button>
-        ))}
+        {apps.map((app) => {
+          const isOpen = openApps.includes(app.id) && !minimizedApps.includes(app.id);
+          return (
+            <button
+              aria-label={app.label}
+              aria-pressed={isOpen}
+              className="dock-app"
+              data-active={activeApp === app.id && isOpen}
+              data-open={isOpen}
+              key={app.id}
+              onClick={() => openApp(app.id)}
+              type="button"
+            >
+              <span className="dock-app__glyph" aria-hidden="true">{app.glyph}</span>
+              <span className="dock-app__label">{app.label}</span>
+            </button>
+          );
+        })}
       </nav>
-
-      <footer className="os-footnote">
-        TRACE//ZERO · forensic copy · no live system access
-      </footer>
     </main>
   );
 }

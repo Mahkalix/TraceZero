@@ -10,23 +10,20 @@
 
 .entry-os__wallpaper {
   position: fixed;
-  inset: -2%;
-  width: 104%;
-  height: 104%;
+  inset: -1%;
+  width: 102%;
+  height: 102%;
   object-fit: cover;
   object-position: center;
-  filter: saturate(0.94) brightness(0.6) contrast(1.04);
-  transform: scale(1.01);
+  filter: saturate(0.96) brightness(0.72) contrast(1.02);
 }
 
 .entry-os__veil {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(circle at 72% 18%, rgb(29 214 207 / 5%), transparent 30rem),
-    radial-gradient(circle at 46% 56%, rgb(198 68 126 / 6%), transparent 26rem),
-    linear-gradient(180deg, rgb(4 6 8 / 8%), rgb(4 6 8 / 46%));
-  backdrop-filter: blur(0.4px);
+    linear-gradient(90deg, rgb(5 7 9 / 62%) 0%, rgb(5 7 9 / 26%) 46%, rgb(5 7 9 / 18%) 100%),
+    linear-gradient(180deg, rgb(5 7 9 / 8%), rgb(5 7 9 / 28%));
 }
 
 .entry-menubar {
@@ -34,8 +31,8 @@
   z-index: 10;
   top: $space-3;
   left: 50%;
-  width: min(calc(100% - 2rem), 78rem);
-  min-height: 2.85rem;
+  width: min(calc(100% - 2rem), 76rem);
+  min-height: 2.75rem;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
@@ -43,29 +40,22 @@
   gap: $space-4;
   padding: 0 $space-4;
   border: 1px solid rgb(255 255 255 / 12%);
-  border-radius: 1.1rem;
-  background: rgb(15 18 21 / 56%);
+  border-radius: 1rem;
+  background: rgb(13 16 19 / 48%);
   box-shadow:
-    0 0.75rem 3rem rgb(0 0 0 / 24%),
-    inset 0 1px 0 rgb(255 255 255 / 8%);
-  backdrop-filter: blur(26px) saturate(1.15);
+    0 0.75rem 2.5rem rgb(0 0 0 / 20%),
+    inset 0 1px 0 rgb(255 255 255 / 7%);
+  backdrop-filter: blur(22px);
   font-family: var(--font-mono), monospace;
-  font-size: 0.62rem;
-}
+  font-size: 0.58rem;
 
-.entry-menubar__brand,
-.entry-menubar__status {
-  display: flex;
-  align-items: center;
-  gap: $space-3;
-}
-
-.entry-menubar__brand {
-  strong {
-    font-size: 0.68rem;
+  > div {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
   }
 
-  > span:last-child {
+  > span {
     color: $color-text-subtle;
   }
 }
@@ -73,98 +63,59 @@
 .entry-mark {
   display: grid;
   place-items: center;
-  width: 1.65rem;
-  height: 1.65rem;
-  border-radius: 0.55rem;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 0.5rem;
   color: #0c1114;
-  background: rgb(215 224 223 / 90%);
-  font-size: 0.56rem;
+  background: rgb(225 231 229 / 92%);
+  font-size: 0.52rem;
   font-weight: 900;
-}
-
-.entry-menubar__status {
-  color: $color-text-subtle;
-  text-transform: uppercase;
-
-  i {
-    width: 0.45rem;
-    height: 0.45rem;
-    border-radius: 50%;
-    background: #a8d6c9;
-    box-shadow: 0 0 0.7rem rgb(168 214 201 / 52%);
-  }
 }
 
 .entry-stage {
   position: relative;
-  z-index: 3;
+  z-index: 2;
   min-height: 100vh;
-  width: min(100%, 86rem);
+  width: min(100%, 76rem);
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 15rem;
-  gap: $space-5;
-  align-items: center;
-  padding: 6.5rem clamp($space-4, 4vw, $space-7) 7rem;
-}
-
-.entry-login {
-  width: min(100%, 56rem);
-  display: grid;
-  grid-template-columns: minmax(14rem, 20rem) minmax(0, 1fr);
-  overflow: hidden;
-  border: 1px solid rgb(255 255 255 / 13%);
-  border-radius: 1.55rem;
-  background: rgb(14 17 20 / 64%);
-  box-shadow:
-    0 2rem 6rem rgb(0 0 0 / 34%),
-    inset 0 1px 0 rgb(255 255 255 / 9%);
-  backdrop-filter: blur(32px) saturate(1.12);
-}
-
-.entry-login__portrait {
-  min-height: 31rem;
-  overflow: hidden;
-  position: relative;
-
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(90deg, transparent 60%, rgb(14 17 20 / 88%)),
-      linear-gradient(180deg, transparent 62%, rgb(14 17 20 / 46%));
-    pointer-events: none;
-  }
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-  }
-}
-
-.entry-login__copy {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  padding: 6rem clamp($space-4, 4vw, $space-7);
+}
+
+.entry-card {
+  width: min(100%, 34rem);
   padding: clamp($space-5, 5vw, $space-7);
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 1.4rem;
+  background: rgb(12 15 18 / 60%);
+  box-shadow:
+    0 2rem 6rem rgb(0 0 0 / 28%),
+    inset 0 1px 0 rgb(255 255 255 / 8%);
+  backdrop-filter: blur(26px) saturate(1.08);
 
   h1 {
     margin: $space-2 0 $space-4;
-    font-size: clamp(2.7rem, 6vw, 5.4rem);
+    font-size: clamp(2.5rem, 6vw, 4.8rem);
     font-weight: 550;
-    letter-spacing: -0.07em;
-    line-height: 0.9;
+    letter-spacing: -0.065em;
+    line-height: 0.92;
   }
 
-  > p {
-    max-width: 31rem;
+  p {
+    max-width: 30rem;
     margin: 0;
     color: $color-text-muted;
-    font-size: 0.93rem;
-    line-height: 1.75;
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  small {
+    display: block;
+    margin-top: $space-4;
+    color: $color-text-subtle;
+    font-size: 0.6rem;
+    line-height: 1.5;
   }
 }
 
@@ -173,122 +124,27 @@
   font-family: var(--font-mono), monospace;
   font-size: 0.55rem;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
-.entry-login__meta {
-  display: grid;
-  gap: 0;
-  margin: $space-5 0;
-
-  div {
-    display: grid;
-    grid-template-columns: 7rem 1fr;
-    gap: $space-3;
-    padding: $space-2 0;
-    border-bottom: 1px solid rgb(255 255 255 / 7%);
-  }
-
-  dt {
-    color: $color-text-subtle;
-    font-family: var(--font-mono), monospace;
-    font-size: 0.55rem;
-  }
-
-  dd {
-    margin: 0;
-    color: $color-text;
-    font-family: var(--font-mono), monospace;
-    font-size: 0.65rem;
-  }
-}
-
-.entry-login__button {
+.entry-button {
   min-height: 2.8rem;
   width: fit-content;
   display: inline-flex;
   align-items: center;
   gap: $space-4;
+  margin-top: $space-5;
   padding: 0 $space-4;
-  border: 1px solid rgb(255 255 255 / 12%);
-  border-radius: 0.85rem;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 0.8rem;
   color: #101416;
-  background: rgb(224 231 229 / 92%);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 58%);
+  background: rgb(226 232 230 / 94%);
   font-size: 0.72rem;
   font-weight: 700;
   text-decoration: none;
 
   &:hover {
-    background: #ffffff;
+    background: #fff;
   }
-
-  span {
-    font-size: 0.9rem;
-  }
-}
-
-.entry-glance {
-  display: grid;
-  gap: $space-2;
-  align-self: center;
-
-  > div {
-    display: grid;
-    gap: 0.2rem;
-    padding: $space-3;
-    border: 1px solid rgb(255 255 255 / 10%);
-    border-radius: 1rem;
-    background: rgb(16 19 22 / 42%);
-    box-shadow: 0 1rem 2.6rem rgb(0 0 0 / 18%);
-    backdrop-filter: blur(18px);
-  }
-
-  strong {
-    font-size: 0.7rem;
-  }
-
-  small {
-    color: $color-text-subtle;
-    font-size: 0.57rem;
-  }
-}
-
-.entry-dock {
-  position: fixed;
-  z-index: 8;
-  bottom: 2.2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: $space-2;
-  padding: $space-2 $space-3;
-  border: 1px solid rgb(255 255 255 / 12%);
-  border-radius: 1.15rem;
-  color: $color-text-muted;
-  background: rgb(18 21 24 / 50%);
-  box-shadow: 0 1rem 3rem rgb(0 0 0 / 24%);
-  backdrop-filter: blur(26px);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.52rem;
-}
-
-.entry-dock span {
-  padding: 0.55rem 0.7rem;
-  border-radius: 0.65rem;
-  background: rgb(255 255 255 / 4%);
-}
-
-.entry-footnote {
-  position: fixed;
-  z-index: 8;
-  right: $space-4;
-  bottom: $space-3;
-  color: rgb(255 255 255 / 28%);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.48rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .briefing__facts {
@@ -297,43 +153,20 @@
   margin: $space-6 0;
 }
 
-@media (max-width: 62rem) {
-  .entry-stage {
-    grid-template-columns: 1fr;
-  }
-
-  .entry-glance {
-    display: none;
-  }
-}
-
 @media (max-width: 48rem) {
   .entry-menubar {
     width: calc(100% - 1rem);
-  }
 
-  .entry-menubar__status span {
-    display: none;
+    > span {
+      display: none;
+    }
   }
 
   .entry-stage {
-    padding: 5.6rem $space-3 6.5rem;
+    padding: 5.4rem $space-3 $space-4;
   }
 
-  .entry-login {
-    grid-template-columns: 1fr;
-  }
-
-  .entry-login__portrait {
-    min-height: 18rem;
-    max-height: 22rem;
-  }
-
-  .entry-login__portrait::after {
-    background: linear-gradient(180deg, transparent 55%, rgb(14 17 20 / 92%));
-  }
-
-  .entry-footnote {
-    display: none;
+  .entry-card {
+    width: 100%;
   }
 }
