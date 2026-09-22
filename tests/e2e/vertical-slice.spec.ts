@@ -25,7 +25,7 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
   await page.getByRole("checkbox", { name: "domaine ressemblant" }).check();
   await page.getByRole("button", { name: "Valider l’analyse" }).click();
 
-  await expect(page.getByText("Pression temporelle")).toBeVisible();
+  await expect(page.getByText("Pression temporelle", { exact: true })).toBeVisible();
   await expect(page.getByText("Domaine homographe")).toBeVisible();
 
   await page.getByRole("tab", { name: "Hypothèse" }).click();
@@ -96,6 +96,6 @@ test("une fenêtre se déplace fluidement puis peut être rangée", async ({ pag
   await page.getByRole("button", { name: "Ranger" }).click();
   await expect(window).toHaveAttribute(
     "style",
-    /translate3d\(0px, 0px, 0\)/,
+    /translate3d\\(0px, 0px, 0px\\)/,
   );
 });
