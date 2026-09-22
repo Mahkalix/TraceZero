@@ -12,9 +12,24 @@
   background: $color-accent;
   font-weight: 700;
   text-decoration: none;
+  cursor: pointer;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: $color-accent-strong;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.button--secondary {
+  color: $color-text;
+  background: transparent;
+
+  &:hover:not(:disabled) {
+    color: #04110f;
   }
 }
 
