@@ -230,127 +230,156 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
 
   function renderMail() {
     return (
-      <div className="mail-app">
-        <aside className="mail-list" aria-label="Boîte de réception">
-          <div className="module-header">
-            <span>MAILBOX</span>
-            <span>{String(emails.length).padStart(2, "0")} ITEMS</span>
-          </div>
-          {emails.map((email, index) => (
-            <button
-              className="mail-list__item"
-              data-active={email.id === selectedEmail.id}
-              key={email.id}
-              onClick={() => {
-                setSelectedEmailId(email.id);
-                setAnalysisOpen(false);
-                setSignals([]);
-              }}
-              type="button"
-            >
-              <small>{String(index + 1).padStart(2, "0")}</small>
-              <span>{email.from}</span>
-              <strong>{email.subject}</strong>
-              <time>{email.date}</time>
-            </button>
-          ))}
-        </aside>
-
-        <article className="mail-reader" aria-labelledby="mail-subject">
-          <div className="module-header">
-            <span>MESSAGE_VIEWER</span>
-            <span>{selectedEmail.id.toUpperCase()}</span>
-          </div>
-
-          <header className="mail-reader__header">
+      <section className="mail-screen" aria-labelledby="mail-module-title">
+        <div className="mail-context">
+          <div className="mail-context__item">
+            <span className="mail-context__code">A</span>
             <div>
-              <p className="crt-kicker">{selectedEmail.date}</p>
-              <h2 id="mail-subject">{selectedEmail.subject}</h2>
+              <span className="system-label">USER</span>
+              <strong>JUDY_ALVAREZ</strong>
             </div>
-            {selectedEmail.external ? (
-              <span className="warning-label">EXTERNAL</span>
-            ) : null}
-          </header>
-
-          <dl className="mail-meta">
-            <div><dt>FROM</dt><dd>{selectedEmail.from}</dd></div>
-            <div><dt>TO</dt><dd>{selectedEmail.to}</dd></div>
-          </dl>
-
-          <div className="mail-reader__body">
-            {selectedEmail.body.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-            {selectedEmail.displayLink ? (
-              <div className="trace-box">
-                <span>DISPLAY</span>
-                <strong>{selectedEmail.displayLink}</strong>
-                <span>RESOLVES TO</span>
-                <code>{selectedEmail.actualLink}</code>
-              </div>
-            ) : null}
           </div>
+          <div className="mail-context__item">
+            <span className="mail-context__code">B</span>
+            <div>
+              <span className="system-label">DESCRIPTION</span>
+              <strong>MAILBOX / FORENSIC COPY</strong>
+            </div>
+          </div>
+          <div className="mail-context__item mail-context__item--levels">
+            <span className="mail-context__code">C</span>
+            <div>
+              <span className="system-label">SECURITY LEVEL</span>
+              <div className="mail-security-levels" aria-label="Niveau de sécurité du contenu">
+                <span>01</span>
+                <span className="is-active">02</span>
+                <span>03</span>
+                <span>04</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-          <div className="mail-actionbar" aria-label="Actions du message">
+        <div className="mail-layout">
+          <aside className="mail-list" aria-label="Boîte de réception">
+            <div className="module-header">
+              <span id="mail-module-title">LIST OF MESSAGES</span>
+              <span>{String(emails.length).padStart(2, "0")}</span>
+            </div>
+
+            <div className="mail-list__stack">
+              {emails.map((email, index) => (
+                <button
+                  className="mail-list__item"
+                  data-active={email.id === selectedEmail.id}
+                  key={email.id}
+                  onClick={() => {
+                    setSelectedEmailId(email.id);
+                    setAnalysisOpen(false);
+                    setSignals([]);
+                  }}
+                  type="button"
+                >
+                  <span className="mail-list__icon" aria-hidden="true">✉</span>
+                  <span className="mail-list__copy">
+                    <strong>{email.subject}</strong>
+                    <small>{email.from}</small>
+                  </span>
+                  <time>{String(index + 1).padStart(2, "0")}</time>
+                </button>
+              ))}
+            </div>
+          </aside>
+
+          <article className="mail-reader" aria-labelledby="mail-subject">
+            <div className="mail-reader__panel">
+              <header className="mail-reader__header">
+                <div>
+                  <p className="crt-kicker">{selectedEmail.date}</p>
+                  <h2 id="mail-subject">{selectedEmail.subject}</h2>
+                </div>
+                {selectedEmail.external ? (
+                  <span className="warning-label">EXTERNAL</span>
+                ) : null}
+              </header>
+
+              <dl className="mail-meta">
+                <div><dt>FROM</dt><dd>{selectedEmail.from}</dd></div>
+                <div><dt>TO</dt><dd>{selectedEmail.to}</dd></div>
+              </dl>
+
+              <div className="mail-reader__body">
+                {selectedEmail.body.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+
+                {selectedEmail.displayLink ? (
+                  <div className="trace-box">
+                    <span>DISPLAY</span>
+                    <strong>{selectedEmail.displayLink}</strong>
+                    <span>RESOLVES TO</span>
+                    <code>{selectedEmail.actualLink}</code>
+                  </div>
+                ) : null}
+              </div>
+
+              {analysisOpen ? (
+                <section
+                  className="analysis-panel"
+                  id="analysis-panel"
+                  aria-labelledby="analysis-title"
+                >
+                  <div className="module-header">
+                    <span id="analysis-title">SIGNAL ANALYSIS</span>
+                    <span>{signals.length}/4</span>
+                  </div>
+                  <fieldset>
+                    <legend className="sr-only">Indices observés</legend>
+                    {(Object.entries(signalLabels) as [PhishingSignal, string][]).map(
+                      ([signal, label], index) => (
+                        <label key={signal} className="signal-option">
+                          <input
+                            checked={signals.includes(signal)}
+                            onChange={() => toggleSignal(signal)}
+                            type="checkbox"
+                          />
+                          <span className="signal-option__index">
+                            {String(index + 1).padStart(2, "0")}
+                          </span>
+                          <span>{label}</span>
+                        </label>
+                      ),
+                    )}
+                  </fieldset>
+                  <button
+                    className="crt-action crt-action--compact"
+                    type="button"
+                    onClick={validateAnalysis}
+                  >
+                    CONFIRMER LES SIGNAUX
+                  </button>
+                </section>
+              ) : null}
+            </div>
+          </article>
+
+          <aside className="mail-toolrail" aria-label="Outils du message">
+            <button type="button" className="is-active" onClick={() => setAnalysisOpen(false)}>
+              DETAILS
+            </button>
             <button
-              className="mail-actionbar__primary"
               type="button"
               onClick={() => setAnalysisOpen((open) => !open)}
               aria-expanded={analysisOpen}
               aria-controls="analysis-panel"
             >
-              ANALYSER
+              SIGNALS
             </button>
-            <button type="button" disabled>
-              ÉPINGLER
-            </button>
-            <button type="button" disabled>
-              COMPARER
-            </button>
-            <button type="button" onClick={() => setAnalysisOpen(false)}>
-              FERMER
-            </button>
-          </div>
-
-          {analysisOpen ? (
-            <section
-              className="analysis-panel"
-              id="analysis-panel"
-              aria-labelledby="analysis-title"
-            >
-              <div className="module-header">
-                <span id="analysis-title">SIGNAL ANALYSIS</span>
-                <span>{signals.length}/4 SELECTED</span>
-              </div>
-              <fieldset>
-                <legend className="sr-only">Indices observés</legend>
-                {(Object.entries(signalLabels) as [PhishingSignal, string][]).map(
-                  ([signal, label], index) => (
-                    <label key={signal} className="signal-option">
-                      <input
-                        checked={signals.includes(signal)}
-                        onChange={() => toggleSignal(signal)}
-                        type="checkbox"
-                      />
-                      <span className="signal-option__index">
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                      <span>{label}</span>
-                    </label>
-                  ),
-                )}
-              </fieldset>
-              <button
-                className="crt-action crt-action--compact"
-                type="button"
-                onClick={validateAnalysis}
-              >
-                CONFIRMER LES SIGNAUX
-              </button>
-            </section>
-          ) : null}
-        </article>
-      </div>
+            <button type="button" disabled>SOURCE</button>
+            <button type="button" onClick={() => setNotebookTab("evidence")}>NOTES</button>
+          </aside>
+        </div>
+      </section>
     );
   }
 
