@@ -1129,3 +1129,97 @@
     display: none;
   }
 }
+
+.desktop-artifact {
+  position: absolute;
+  z-index: 1;
+  width: 14.5rem;
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-3;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 1rem;
+  color: $color-text-muted;
+  background: rgb(16 19 22 / 38%);
+  box-shadow: 0 1rem 2.6rem rgb(0 0 0 / 18%);
+  backdrop-filter: blur(18px);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    color: $color-text;
+    background: rgb(255 255 255 / 7%);
+  }
+
+  > span:last-child {
+    min-width: 0;
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  small {
+    color: $color-text-subtle;
+    font-family: var(--font-mono), monospace;
+    font-size: 0.48rem;
+    letter-spacing: 0.08em;
+  }
+
+  strong,
+  em {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong {
+    color: inherit;
+    font-size: 0.68rem;
+  }
+
+  em {
+    color: $color-text-subtle;
+    font-size: 0.57rem;
+    font-style: normal;
+  }
+}
+
+.desktop-artifact__icon {
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.75rem;
+  background: rgb(255 255 255 / 6%);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+}
+
+.desktop-artifact--file {
+  left: 3%;
+  bottom: 7%;
+}
+
+.desktop-artifact--memo {
+  right: 1.5%;
+  top: 10.5rem;
+}
+
+.app-window[data-app="mail"] {
+  width: min(80%, 68rem);
+}
+
+.app-window[data-app="terminal"] {
+  width: min(72%, 58rem);
+}
+
+.app-window[data-app="network"] {
+  width: min(76%, 62rem);
+}
+
+@media (max-width: 76rem) {
+  .desktop-artifact {
+    display: none;
+  }
+}
