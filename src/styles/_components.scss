@@ -1,43 +1,96 @@
 @use "tokens" as *;
 
-.button {
+.button,
+.crt-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: $space-2;
   min-height: 2.75rem;
   padding: 0.75rem 1rem;
-  border: 0.0625rem solid $color-accent;
-  border-radius: $radius-sm;
-  color: #04110f;
+  border: 1px solid $color-accent;
+  border-radius: $radius-xs;
+  color: $color-bg;
   background: $color-accent;
-  font-weight: 700;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.055em;
   text-decoration: none;
+  text-transform: uppercase;
   cursor: pointer;
 
   &:hover:not(:disabled) {
+    color: $color-bg;
     background: $color-accent-strong;
   }
 
   &:disabled {
-    opacity: 0.45;
+    border-color: $line-subtle;
+    color: $color-text-subtle;
+    background: transparent;
     cursor: not-allowed;
   }
 }
 
-.button--secondary {
-  color: $color-text;
-  background: transparent;
-
-  &:hover:not(:disabled) {
-    color: #04110f;
-  }
+.crt-action span {
+  color: $color-bg;
+  opacity: 0.65;
 }
 
-.eyebrow {
-  margin: 0 0 $space-3;
+.crt-action--compact {
+  min-height: 2.35rem;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.7rem;
+}
+
+.button--secondary {
+  color: $color-accent;
+  background: transparent;
+}
+
+.eyebrow,
+.crt-kicker,
+.screen-code {
+  margin: 0;
   color: $color-accent;
   font-family: var(--font-mono), monospace;
-  font-size: 0.875rem;
-  letter-spacing: 0.06em;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.screen-index {
+  color: $color-text-subtle;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+}
+
+.module-header {
+  min-height: 2.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
+  padding: 0 $space-3;
+  border-bottom: 1px solid $line-strong;
+  color: $color-accent;
+  background: rgb(115 255 72 / 3%);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.text-link {
+  padding: 0;
+  border: 0;
+  color: $color-accent;
+  background: none;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+  cursor: pointer;
 }
