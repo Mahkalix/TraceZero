@@ -5,6 +5,7 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
 
   await expect(page.getByRole("heading", { name: "Entrer dans l’ordinateur de Judy." })).toBeVisible();
   await page.getByRole("link", { name: "Ouvrir le bureau" }).click();
+  await page.waitForURL("**/case/001");
 
   await expect(page.locator("img.judy-os__wallpaper")).toHaveAttribute(
     "src",
@@ -57,7 +58,10 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
 
   await page.getByRole("button", { name: "Timeline", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Timeline" })).toBeVisible();
-  await expect(page.getByText("Empreinte divergente", { exact: true })).toBeVisible();
+  const timelineWindow = page.locator('[data-app="timeline"]');
+  await expect(
+    timelineWindow.getByText("Empreinte divergente", { exact: true }),
+  ).toBeVisible();
 });
 
 test("une fenêtre se déplace fluidement puis peut être rangée", async ({ page }) => {
