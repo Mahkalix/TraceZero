@@ -21,8 +21,8 @@
   background:
     repeating-linear-gradient(
       0deg,
-      rgb(115 255 72 / 1.7%) 0,
-      rgb(115 255 72 / 1.7%) 1px,
+      rgb(231 231 227 / 1.2%) 0,
+      rgb(231 231 227 / 1.2%) 1px,
       transparent 1px,
       transparent 4px
     ),
@@ -38,7 +38,7 @@
   gap: $space-5;
   padding: 0 $space-4;
   border-bottom: 1px solid $line-strong;
-  background: rgb(2 4 2 / 96%);
+  background: rgb(12 14 15 / 97%);
 }
 
 .brand-lockup {
@@ -88,7 +88,7 @@
   display: flex;
   flex-direction: column;
   border-right: 1px solid $line-strong;
-  background: rgb(3 6 3 / 94%);
+  background: rgb(14 16 17 / 95%);
 }
 
 .rail-label,
@@ -134,7 +134,7 @@
 
   &:hover:not([data-active="true"]) {
     color: $color-accent;
-    background: rgb(115 255 72 / 4%);
+    background: rgb(184 201 187 / 5%);
   }
 }
 
@@ -156,7 +156,7 @@
   min-height: 34rem;
   overflow: hidden;
   border: 1px solid $line-strong;
-  background: rgb(4 7 4 / 96%);
+  background: rgb(18 20 21 / 96%);
   box-shadow: $shadow-panel;
 }
 
@@ -228,8 +228,8 @@
   border: 1px solid $accent-line;
   color: $color-accent;
   background:
-    linear-gradient(45deg, transparent 49%, rgb(115 255 72 / 12%) 50%, transparent 51%),
-    repeating-linear-gradient(0deg, rgb(115 255 72 / 5%) 0 1px, transparent 1px 4px);
+    linear-gradient(45deg, transparent 49%, rgb(184 201 187 / 10%) 50%, transparent 51%),
+    repeating-linear-gradient(0deg, rgb(184 201 187 / 4%) 0 1px, transparent 1px 4px);
 
   span {
     font-size: 2.5rem;
@@ -278,7 +278,7 @@
 .mission-block {
   padding: $space-4;
   border: 1px solid $line-subtle;
-  background: rgb(115 255 72 / 2%);
+  background: rgb(184 201 187 / 2.5%);
 
   ol {
     display: grid;
@@ -431,9 +431,9 @@
   gap: $space-2;
   margin-top: $space-5;
   padding: $space-4;
-  border: 1px solid rgb(255 90 31 / 40%);
+  border: 1px solid rgb(155 126 102 / 38%);
   color: $color-orange;
-  background: rgb(255 90 31 / 4%);
+  background: rgb(155 126 102 / 6%);
   font-family: var(--font-mono), monospace;
 
   span {
@@ -453,7 +453,7 @@
   margin-top: $space-5 !important;
   padding: 0 0 $space-4;
   border: 1px solid $line-strong;
-  background: rgb(115 255 72 / 2%);
+  background: rgb(184 201 187 / 2.5%);
 
   fieldset {
     display: grid;
@@ -560,7 +560,7 @@
 }
 
 .log-row--head {
-  background: rgb(115 255 72 / 4%);
+  background: rgb(184 201 187 / 5%);
 
   span {
     color: $color-accent;
@@ -595,7 +595,7 @@
 }
 
 .node--alert {
-  border-color: rgb(255 90 31 / 45%);
+  border-color: rgb(155 126 102 / 42%);
   color: $color-orange;
 }
 
@@ -621,7 +621,7 @@
   padding: $space-4;
   border: 1px solid $line-subtle;
   color: $color-accent;
-  background: #010201;
+  background: #0a0b0c;
   font-size: 0.72rem;
   line-height: 1.65;
 
@@ -708,7 +708,7 @@
   min-width: 0;
   overflow: auto;
   border-left: 1px solid $line-strong;
-  background: rgb(3 6 3 / 96%);
+  background: rgb(14 16 17 / 96%);
 }
 
 .notebook__tabs {
@@ -931,4 +931,87 @@
   .desktop-footer {
     display: none;
   }
+}
+
+/* Muted industrial pass inspired by the message-system reference */
+.desktop-sidebar__item[data-active="true"],
+.mail-list__item[data-active="true"],
+.notebook__tabs button[aria-selected="true"],
+.signal-option:has(input:checked) {
+  color: #161917;
+  background:
+    linear-gradient(90deg, rgb(255 255 255 / 8%), transparent 72%),
+    $color-accent;
+}
+
+.desktop-sidebar__item[data-active="true"] .desktop-sidebar__key,
+.mail-list__item[data-active="true"] small,
+.mail-list__item[data-active="true"] strong,
+.mail-list__item[data-active="true"] time {
+  color: #161917;
+}
+
+.status-dot {
+  background: $color-success;
+  box-shadow: none;
+}
+
+.brand-lockup__name,
+.case-screen__hero h2 {
+  color: $color-text;
+}
+
+.window,
+.notebook,
+.desktop-sidebar {
+  background-image:
+    linear-gradient(135deg, rgb(255 255 255 / 1.1%), transparent 24%),
+    repeating-linear-gradient(
+      0deg,
+      rgb(255 255 255 / 0.7%) 0 1px,
+      transparent 1px 6px
+    );
+}
+
+.window__titlebar,
+.desktop-footer {
+  background-color: $color-bg-soft;
+}
+
+.mail-list__item:hover:not([data-active="true"]),
+.desktop-sidebar__item:hover:not([data-active="true"]) {
+  color: $color-text;
+  background: rgb(255 255 255 / 3%);
+}
+
+.trace-box {
+  color: $color-warning;
+}
+
+.warning-label,
+.warning-text,
+.node--alert {
+  color: $color-warning;
+}
+
+.network-line {
+  background: $color-accent-dim;
+}
+
+.network-line span {
+  color: $color-text-muted;
+}
+
+.terminal-output {
+  color: $color-text-muted;
+}
+
+.terminal-command span,
+.terminal-form label,
+.terminal-hint code {
+  color: $color-accent;
+}
+
+.locked-module h2 {
+  color: $color-text;
 }
