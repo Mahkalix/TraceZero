@@ -1,0 +1,28 @@
+@use "tokens" as *;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.75rem 1rem;
+  border: 0.0625rem solid $color-accent;
+  border-radius: $radius-sm;
+  color: #04110f;
+  background: $color-accent;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    background: $color-accent-strong;
+  }
+}
+
+.eyebrow {
+  margin: 0 0 $space-3;
+  color: $color-accent;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
