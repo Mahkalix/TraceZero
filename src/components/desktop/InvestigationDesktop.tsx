@@ -292,7 +292,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   }
 
   return (
-    <main className="desktop-shell">
+    <main className="desktop-shell" id="main-content">
       <p className="sr-only" aria-live="polite">
         {announcement}
       </p>
