@@ -6,22 +6,26 @@
   align-items: center;
   justify-content: center;
   gap: $space-2;
-  min-height: 2.75rem;
-  padding: 0.75rem 1rem;
-  border: 1px solid $color-accent;
+  min-height: 2.7rem;
+  padding: 0.72rem 1rem;
+  border: 1px solid $line-strong;
   border-radius: $radius-xs;
-  color: $color-bg;
+  color: #171a18;
   background: $color-accent;
   font-family: var(--font-mono), monospace;
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-size: 0.75rem;
+  font-weight: 750;
   letter-spacing: 0.055em;
   text-decoration: none;
   text-transform: uppercase;
   cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
 
   &:hover:not(:disabled) {
-    color: $color-bg;
+    border-color: $color-accent-strong;
     background: $color-accent-strong;
   }
 
@@ -34,18 +38,18 @@
 }
 
 .crt-action span {
-  color: $color-bg;
-  opacity: 0.65;
+  color: #303531;
+  opacity: 0.7;
 }
 
 .crt-action--compact {
-  min-height: 2.35rem;
-  padding: 0.55rem 0.75rem;
-  font-size: 0.7rem;
+  min-height: 2.3rem;
+  padding: 0.52rem 0.72rem;
+  font-size: 0.67rem;
 }
 
 .button--secondary {
-  color: $color-accent;
+  color: $color-text;
   background: transparent;
 }
 
@@ -55,7 +59,7 @@
   margin: 0;
   color: $color-accent;
   font-family: var(--font-mono), monospace;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -63,7 +67,7 @@
 .screen-index {
   color: $color-text-subtle;
   font-family: var(--font-mono), monospace;
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   letter-spacing: 0.08em;
 }
 
@@ -75,10 +79,12 @@
   gap: $space-3;
   padding: 0 $space-3;
   border-bottom: 1px solid $line-strong;
-  color: $color-accent;
-  background: rgb(115 255 72 / 3%);
+  color: $color-text-muted;
+  background:
+    linear-gradient(90deg, rgb(184 201 187 / 4%), transparent 35%),
+    $color-panel;
   font-family: var(--font-mono), monospace;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -89,7 +95,7 @@
   color: $color-accent;
   background: none;
   font-family: var(--font-mono), monospace;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   text-decoration: underline;
   text-underline-offset: 0.2rem;
   cursor: pointer;
