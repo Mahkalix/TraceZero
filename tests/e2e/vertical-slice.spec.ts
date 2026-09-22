@@ -8,7 +8,7 @@ test("le joueur peut confirmer la première hypothèse de phishing", async ({
   await page.getByRole("link", { name: "Ouvrir le dossier 001" }).click();
 
   await expect(
-    page.getByRole("heading", { name: "Judy Alvarez · disparition signalée" }),
+    page.getByRole("heading", { name: "Judy Alvarez" }),
   ).toBeVisible();
 
   await page
@@ -17,27 +17,26 @@ test("le joueur peut confirmer la première hypothèse de phishing", async ({
 
   await page
     .getByRole("button", {
-      name: /security@helix-support\.example.*ACTION REQUISE/s,
+      name: /ACTION REQUISE.*security@helix-support\.example/s,
     })
     .click();
 
   await page.getByRole("button", { name: "Analyser ce message" }).click();
 
   await page
-    .getByRole("checkbox", { name: "Pression temporelle artificielle" })
+    .getByRole("checkbox", { name: "pression temporelle" })
     .check();
+
   await page
-    .getByRole("checkbox", {
-      name: "Domaine ressemblant au domaine officiel",
-    })
+    .getByRole("checkbox", { name: "domaine ressemblant" })
     .check();
 
-  await page.getByRole("button", { name: "Valider l'analyse" }).click();
+  await page.getByRole("button", { name: "Valider l’analyse" }).click();
 
-  await expect(page.getByText("Urgence artificielle")).toBeVisible();
+  await expect(page.getByText("Pression temporelle")).toBeVisible();
   await expect(page.getByText("Domaine homographe")).toBeVisible();
 
-  await page.getByRole("tab", { name: "Hypothèses" }).click();
+  await page.getByRole("tab", { name: "Hypothèse" }).click();
 
   const validate = page.getByRole("button", { name: "Valider la conclusion" });
   await expect(validate).toBeEnabled();
