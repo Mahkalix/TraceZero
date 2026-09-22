@@ -1,0 +1,63 @@
+@use "tokens" as *;
+
+.landing,
+.briefing {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: $space-5;
+}
+
+.landing__panel,
+.briefing__panel {
+  width: min(100%, 48rem);
+  padding: clamp($space-5, 4vw, $space-7);
+  border: 0.0625rem solid rgb(255 255 255 / 10%);
+  border-radius: $radius-lg;
+  background: linear-gradient(180deg, $color-panel-strong, $color-panel);
+  box-shadow: $shadow-panel;
+}
+
+.landing h1,
+.briefing h1 {
+  margin: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  line-height: 0.95;
+}
+
+.landing__hook {
+  margin: $space-6 0 $space-4;
+  max-width: 40rem;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  line-height: 1.35;
+}
+
+.landing__summary {
+  max-width: 38rem;
+  margin-bottom: $space-6;
+  color: $color-text-muted;
+  line-height: 1.7;
+}
+
+.briefing__facts {
+  display: grid;
+  gap: $space-4;
+  margin: $space-6 0;
+
+  div {
+    padding: $space-4;
+    border-left: 0.1875rem solid $color-accent;
+    background: rgb(255 255 255 / 3%);
+  }
+
+  dt {
+    color: $color-text-muted;
+    font-size: 0.875rem;
+  }
+
+  dd {
+    margin: $space-1 0 0;
+    font-weight: 700;
+  }
+}

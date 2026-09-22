@@ -1,0 +1,51 @@
+@use "tokens" as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  background: $color-bg;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-ui), system-ui, sans-serif;
+  color: $color-text;
+  background:
+    radial-gradient(circle at top right, rgb(88 225 211 / 8%), transparent 32rem),
+    $color-bg;
+}
+
+a,
+button {
+  font: inherit;
+}
+
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 0.1875rem solid $color-focus;
+  outline-offset: 0.25rem;
+}
+
+code,
+pre,
+.mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
