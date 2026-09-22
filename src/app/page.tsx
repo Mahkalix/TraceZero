@@ -4,48 +4,89 @@ export default function HomePage() {
   return (
     <main className="landing" id="main-content">
       <section className="landing__frame" aria-labelledby="case-title">
-        <header className="landing__topline" aria-label="Statut du dossier">
-          <span className="landing__status">
+        <header className="landing__topline">
+          <div className="landing__brand">
+            <span>TRACE//ZERO</span>
+            <small>FORENSIC INVESTIGATION SYSTEM</small>
+          </div>
+          <div className="landing__status">
             <span aria-hidden="true" className="status-dot" />
-            dossier actif
-          </span>
-          <span className="mono">CASE_001 / READ_ONLY</span>
+            <span>SYSTEM ONLINE</span>
+          </div>
         </header>
+
         <div className="landing__content">
           <div className="landing__copy">
-            <p className="eyebrow">Trace de disparition · 36h</p>
-            <h1 id="case-title">Trace<span aria-hidden="true">//</span>Zero</h1>
+            <p className="landing__sequence">CASE_001 / SUBJECT_MISSING / 36H</p>
+
+            <h1 id="case-title">
+              ENTER
+              <span> THE SYSTEM</span>
+            </h1>
+
+            <div className="landing__rule" aria-hidden="true">
+              <span />
+              <strong>01</strong>
+            </div>
+
             <p className="landing__hook">
               Judy Alvarez n&apos;a pas été vue depuis 36 heures.
-              <span> Son ordinateur, lui, ne s&apos;est jamais déconnecté.</span>
+              Son ordinateur ne s&apos;est jamais déconnecté.
             </p>
+
             <p className="landing__summary">
-              Vous recevez une copie forensic de son poste. Votre mission :
-              reconstruire ses dernières heures, isoler une compromission et
-              soutenir chaque conclusion par des preuves.
+              Analysez une copie forensic de son poste. Reconstituez ses
+              dernières activités, isolez la compromission et ne validez aucune
+              conclusion sans preuve.
             </p>
+
             <div className="landing__actions">
-              <Link className="button" href="/case/001">Ouvrir le dossier 001</Link>
-              <span className="landing__hint mono">aucune donnée originale ne sera modifiée</span>
+              <Link className="crt-action landing__enter" href="/case/001">
+                <span>PLAY</span>
+                OUVRIR LE DOSSIER
+              </Link>
+              <p className="landing__hint">
+                INPUT: KEYBOARD / MOUSE
+                <br />
+                MEDIA: READ_ONLY
+              </p>
             </div>
           </div>
-          <aside className="landing__casefile" aria-label="Résumé du dossier">
-            <div className="casefile__portrait" aria-hidden="true"><span>JA</span></div>
-            <div className="casefile__identity">
-              <p className="eyebrow">Personne recherchée</p>
-              <h2>Judy Alvarez</h2>
-              <p>Développeuse backend · Helix Systems</p>
+
+          <aside className="landing__casefile" aria-label="Résumé du dossier Judy Alvarez">
+            <div className="casefile__screen">
+              <div className="casefile__screen-header">
+                <span>SUBJECT PROFILE</span>
+                <span>ACCESS: AUTHORIZED</span>
+              </div>
+
+              <div className="casefile__portrait" aria-hidden="true">
+                <div className="casefile__target">
+                  <span>JA</span>
+                </div>
+                <div className="casefile__crosshair" />
+              </div>
+
+              <div className="casefile__identity">
+                <span className="screen-code">SUBJECT_01</span>
+                <h2>JUDY ALVAREZ</h2>
+                <p>BACKEND DEVELOPER / HELIX SYSTEMS</p>
+              </div>
+
+              <dl className="casefile__metadata">
+                <div><dt>PROJECT</dt><dd>ORION</dd></div>
+                <div><dt>LAST SIGNAL</dt><dd>22:44:31</dd></div>
+                <div><dt>STATUS</dt><dd className="casefile__alert">MISSING</dd></div>
+                <div><dt>INTEGRITY</dt><dd>VERIFIED COPY</dd></div>
+              </dl>
             </div>
-            <dl className="casefile__metadata">
-              <div><dt>Projet</dt><dd>ORION</dd></div>
-              <div><dt>Dernière activité</dt><dd>12 oct. · 22:44</dd></div>
-              <div><dt>État</dt><dd>Disparition non résolue</dd></div>
-            </dl>
           </aside>
         </div>
-        <footer className="landing__footer mono">
-          <span>FORENSIC_SANDBOX v0.1</span>
-          <span>INTEGRITY: VERIFIED</span>
+
+        <footer className="landing__footer">
+          <span>TRACE FORENSIC SANDBOX · BUILD 2026.09</span>
+          <span>NO LIVE SYSTEM ACCESS</span>
+          <span>CASE 001</span>
         </footer>
       </section>
     </main>
