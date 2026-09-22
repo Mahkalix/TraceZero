@@ -494,44 +494,68 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     <main className="desktop-shell" id="main-content">
       <p className="sr-only" aria-live="polite">{announcement}</p>
 
-      <header className="desktop-topbar">
-        <div className="brand-lockup">
-          <span className="brand-lockup__name">TRACE//ZERO</span>
-          <span className="brand-lockup__meta">FORENSIC INTERFACE</span>
+      <header className="system-header">
+        <div className="system-header__identity">
+          <span className="system-label">CUSTOMER</span>
+          <strong>TRACE//ZERO</strong>
+          <span className="system-id">#NCB8402 / CASE_{caseId}</span>
         </div>
-        <div className="desktop-topbar__center">
-          <span>CASE_{caseId}</span>
-          <span>SUBJECT: JUDY ALVAREZ</span>
+
+        <div className="system-header__subject">
+          <span className="system-label">SUBJECT</span>
+          <strong>JUDY ALVAREZ</strong>
+          <span>HELIX SYSTEMS / ORION</span>
         </div>
-        <div className="desktop-topbar__status">
-          <span aria-hidden="true" className="status-dot" />
-          SYSTEM ONLINE
+
+        <div className="security-levels" aria-label="Niveaux de sécurité">
+          <span className="system-label">SECURITY LEVEL</span>
+          <div>
+            <span className="security-level">T1</span>
+            <span className="security-level security-level--active">T2</span>
+            <span className="security-level">T3</span>
+            <span className="security-level">T4</span>
+          </div>
         </div>
       </header>
 
-      <nav className="desktop-sidebar" aria-label="Applications d'investigation">
-        <div className="rail-label">MODULES</div>
-        {appItems.map((app) => (
-          <button
-            aria-pressed={activeApp === app.id}
-            className="desktop-sidebar__item"
-            data-active={activeApp === app.id}
-            key={app.id}
-            onClick={() => setActiveApp(app.id)}
-            type="button"
-          >
-            <span className="desktop-sidebar__key" aria-hidden="true">{app.code}</span>
-            <span>{app.label}</span>
-          </button>
-        ))}
-        <div className="rail-footer" aria-hidden="true">TZ / 2026</div>
+      <nav className="system-nav" aria-label="Applications d'investigation">
+        <div className="system-nav__legend">
+          <span>COMPUTER SYSTEMS</span>
+          <small>READ_ONLY ENVIRONMENT</small>
+        </div>
+        <div className="system-nav__items">
+          {appItems.map((app) => (
+            <button
+              aria-pressed={activeApp === app.id}
+              className="system-nav__item"
+              data-active={activeApp === app.id}
+              key={app.id}
+              onClick={() => setActiveApp(app.id)}
+              type="button"
+            >
+              <span>{app.label}</span>
+              <small>{app.code}</small>
+            </button>
+          ))}
+        </div>
+        <div className="system-nav__state">
+          <span aria-hidden="true" className="status-dot" />
+          ONLINE
+        </div>
       </nav>
 
       <section className="desktop-workspace" aria-label="Fenêtre active">
+        <span className="edge-label edge-label--left" aria-hidden="true">
+          TRACE SYSTEM / INTERNAL USE
+        </span>
+        <span className="edge-label edge-label--right" aria-hidden="true">
+          SESSION 001 / VERIFIED COPY
+        </span>
+
         <div className="window">
           <div className="window__titlebar">
-            <span>{activeApp.toUpperCase()} / JUDY-LAPTOP</span>
-            <span>READ_ONLY · VERIFIED</span>
+            <span>CONTENT / {activeApp.toUpperCase()}</span>
+            <span>JUDY-LAPTOP · READ_ONLY</span>
           </div>
           <div className="window__content">{renderActiveWindow()}</div>
         </div>
@@ -615,8 +639,8 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
 
       <footer className="desktop-footer">
         <span>TRACE FORENSIC SANDBOX</span>
-        <span>NO SYSTEM COMMANDS · NO EXTERNAL LINKS</span>
-        <span>SESSION 001</span>
+        <span>CASE_{caseId} · SUBJECT_JUDY_ALVAREZ</span>
+        <span>NO LIVE SYSTEM ACCESS</span>
       </footer>
     </main>
   );
