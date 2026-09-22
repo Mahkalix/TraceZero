@@ -35,7 +35,7 @@ test("le joueur peut confirmer la première hypothèse de phishing", async ({
   await page.getByRole("button", { name: "Valider l'analyse" }).click();
 
   await expect(page.getByText("Urgence artificielle")).toBeVisible();
-  await expect(page.getByText("Domaine ressemblant")).toBeVisible();
+  await expect(page.getByText("Domaine homographe")).toBeVisible();
 
   await page.getByRole("tab", { name: "Hypothèses" }).click();
 
