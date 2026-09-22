@@ -47,7 +47,7 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
   await input.fill("sha256sum orion-export.zip");
   await input.press("Enter");
   await expect(page.getByText("MISMATCH: reference hash differs")).toBeVisible();
-  await expect(page.getByText("Empreinte divergente")).toBeVisible();
+  await expect(page.getByText("Empreinte divergente", { exact: true }).first()).toBeVisible();
 
   await page.getByRole("button", { name: "Dossier" }).click();
   await expect(page.getByText("Piste technique consolidée")).toBeVisible();
@@ -94,8 +94,7 @@ test("une fenêtre se déplace fluidement puis peut être rangée", async ({ pag
   expect(Math.abs(after.y - before.y)).toBeGreaterThan(25);
 
   await page.getByRole("button", { name: "Ranger" }).click();
-  await expect(window).toHaveAttribute(
-    "style",
-    /translate3d\\(0px, 0px, 0px\\)/,
+  expect(await window.getAttribute("style")).toContain(
+    "translate3d(0px, 0px, 0px)",
   );
 });
