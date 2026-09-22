@@ -572,6 +572,32 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
             </div>
           </aside>
 
+          <button
+            className="desktop-artifact desktop-artifact--file"
+            type="button"
+            onClick={() => openApp("files")}
+          >
+            <span className="desktop-artifact__icon" aria-hidden="true">□</span>
+            <span>
+              <small>RECENT FILE</small>
+              <strong>orion-export.zip</strong>
+              <em>22:43 · 418 MB</em>
+            </span>
+          </button>
+
+          <button
+            className="desktop-artifact desktop-artifact--memo"
+            type="button"
+            onClick={() => openApp("mail")}
+          >
+            <span className="desktop-artifact__icon" aria-hidden="true">@</span>
+            <span>
+              <small>UNREAD</small>
+              <strong>security@helix-support</strong>
+              <em>session ORION expirée</em>
+            </span>
+          </button>
+
           {notesOpen ? (
             <aside className="notes-inspector" aria-labelledby="notebook-title">
               <header className="notes-inspector__header">
