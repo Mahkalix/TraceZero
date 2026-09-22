@@ -1,32 +1,80 @@
 @use "tokens" as *;
+
 *,*::before,*::after { box-sizing: border-box; }
-html { color-scheme: dark; background: $color-bg; }
+
+html {
+  color-scheme: dark;
+  background: $color-bg;
+}
+
 body {
-  margin: 0; min-height: 100vh;
+  margin: 0;
+  min-height: 100vh;
   font-family: var(--font-ui), system-ui, sans-serif;
   color: $color-text;
   background:
-    radial-gradient(circle at 85% -10%, rgb(99 230 216 / 9%), transparent 28rem),
-    radial-gradient(circle at -10% 90%, rgb(99 230 216 / 4%), transparent 32rem),
+    radial-gradient(circle at 82% 0%, rgb(115 255 72 / 5%), transparent 24rem),
     $color-bg;
   text-rendering: optimizeLegibility;
 }
-::selection { color: $color-bg; background: $color-accent; }
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgb(255 255 255 / 1.4%) 0,
+      rgb(255 255 255 / 1.4%) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+  mix-blend-mode: soft-light;
+  opacity: 0.32;
+}
+
+::selection {
+  color: $color-bg;
+  background: $color-accent;
+}
+
 a,button,input { font: inherit; }
 button { color: inherit; }
-a:focus-visible,button:focus-visible,input:focus-visible,[tabindex]:focus-visible {
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
   outline: 0.1875rem solid $color-focus;
   outline-offset: 0.2rem;
   box-shadow: $shadow-focus;
 }
-code,pre,.mono { font-family: var(--font-mono), ui-monospace, monospace; }
+
+code,pre,.mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
 .skip-link {
-  position: fixed; z-index: 999; top: $space-3; left: $space-3;
+  position: fixed;
+  z-index: 1100;
+  top: $space-3;
+  left: $space-3;
   transform: translateY(-200%);
-  padding: $space-3 $space-4; border-radius: $radius-sm;
-  color: $color-bg; background: $color-focus; font-weight: 800; text-decoration: none;
+  padding: $space-3 $space-4;
+  border: 1px solid $color-focus;
+  border-radius: $radius-xs;
+  color: $color-bg;
+  background: $color-focus;
+  font-family: var(--font-mono), monospace;
+  font-weight: 800;
+  text-decoration: none;
+
   &:focus { transform: translateY(0); }
 }
+
 @media (prefers-reduced-motion: reduce) {
   *,*::before,*::after {
     scroll-behavior: auto !important;
