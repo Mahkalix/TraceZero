@@ -291,15 +291,26 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
             ) : null}
           </div>
 
-          <button
-            className="crt-action"
-            type="button"
-            onClick={() => setAnalysisOpen((open) => !open)}
-            aria-expanded={analysisOpen}
-            aria-controls="analysis-panel"
-          >
-            <span>SCAN</span> ANALYSER CE MESSAGE
-          </button>
+          <div className="mail-actionbar" aria-label="Actions du message">
+            <button
+              className="mail-actionbar__primary"
+              type="button"
+              onClick={() => setAnalysisOpen((open) => !open)}
+              aria-expanded={analysisOpen}
+              aria-controls="analysis-panel"
+            >
+              ANALYSER
+            </button>
+            <button type="button" disabled>
+              ÉPINGLER
+            </button>
+            <button type="button" disabled>
+              COMPARER
+            </button>
+            <button type="button" onClick={() => setAnalysisOpen(false)}>
+              FERMER
+            </button>
+          </div>
 
           {analysisOpen ? (
             <section
