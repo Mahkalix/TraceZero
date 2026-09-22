@@ -1,26 +1,29 @@
-$color-bg: #0b0c0d;
-$color-bg-soft: #101214;
-$color-panel: #141618;
-$color-panel-strong: #191c1f;
-$color-panel-elevated: #202427;
+$color-bg: #16191a;
+$color-bg-soft: #1b1f20;
+$color-panel: #111516;
+$color-panel-strong: #202526;
+$color-panel-elevated: #282d2e;
 
-$color-text: #e7e7e3;
-$color-text-muted: #a4a7a4;
-$color-text-subtle: #686d6b;
+$color-text: #d8dcda;
+$color-text-muted: #9ea5a2;
+$color-text-subtle: #69716e;
 
-$color-accent: #b8c9bb;
-$color-accent-strong: #d4ddd5;
-$color-accent-dim: #68796c;
+$color-accent: #1dd6cf;
+$color-accent-strong: #66f0e8;
+$color-accent-dim: #186d6a;
 
-$color-orange: #9b7e66;
-$color-danger: #a77a72;
-$color-warning: #c9bd9c;
-$color-success: #aebcaf;
-$color-focus: #e8e0c8;
+$color-orange: #c58f4d;
+$color-danger: #b16f68;
+$color-warning: #f1c51d;
+$color-success: #1dd6cf;
+$color-focus: #f1c51d;
 
-$line-subtle: rgb(231 231 227 / 9%);
-$line-strong: rgb(231 231 227 / 16%);
-$accent-line: rgb(184 201 187 / 34%);
+$color-magenta: #8a3947;
+$color-magenta-deep: #4a232d;
+
+$line-subtle: rgb(29 214 207 / 12%);
+$line-strong: rgb(29 214 207 / 34%);
+$accent-line: rgb(29 214 207 / 62%);
 
 $space-1: 0.25rem;
 $space-2: 0.5rem;
@@ -36,5 +39,5 @@ $radius-sm: 0.2rem;
 $radius-md: 0.35rem;
 $radius-lg: 0.5rem;
 
-$shadow-panel: 0 1.5rem 4rem rgb(0 0 0 / 42%);
-$shadow-focus: 0 0 0 0.2rem rgb(232 224 200 / 14%);
+$shadow-panel: 0 1.5rem 4rem rgb(0 0 0 / 45%);
+$shadow-focus: 0 0 0 0.2rem rgb(241 197 29 / 16%);
