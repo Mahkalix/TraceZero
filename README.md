@@ -2,17 +2,19 @@
 
 Jeu narratif d'enquête cyber centré sur la disparition de Judy Alvarez.
 
-## Objectif actuel
+## Vertical slice actuelle
 
-Construire une vertical slice de 10 minutes :
+Le prototype permet déjà de :
 
-1. accueil
-2. briefing
-3. faux bureau
-4. messagerie
-5. email de phishing
-6. analyse
-7. première conclusion
+1. ouvrir le dossier 001
+2. lire le briefing forensic
+3. naviguer dans le faux bureau
+4. consulter six emails
+5. analyser le message de phishing
+6. identifier des indices
+7. débloquer E01 et E02
+8. valider l'hypothèse H01
+9. conserver la progression dans localStorage
 
 ## Stack
 
@@ -22,18 +24,19 @@ Construire une vertical slice de 10 minutes :
 - Zod
 - Vitest
 - Playwright
-- PostgreSQL + Prisma plus tard, après validation de la vertical slice
+- PostgreSQL + Prisma prévus après validation de la vertical slice
 
-## Principes
+## Accessibilité
 
-- logique d'enquête hors des composants React
-- composants sémantiques et navigation clavier
+- HTML sémantique
+- contrôles natifs button/input
+- navigation clavier
 - focus visible
-- contraste contrôlé
-- respect de `prefers-reduced-motion`
-- boutons pour les actions, liens pour la navigation
-- aucune commande système réelle
-- développement via branches et pull requests vers `main`
+- annonces dynamiques via aria-live
+- aria-expanded pour le panneau d'analyse
+- aria-pressed et aria-selected pour les états interactifs
+- respect de prefers-reduced-motion
+- information importante jamais transmise uniquement par couleur
 
 ## Développement local
 
@@ -43,3 +46,7 @@ npm run dev
 ```
 
 Puis ouvrir http://localhost:3000.
+
+## Direction produit
+
+La priorité reste un chemin jouable complet avant l'ajout de la couche PostgreSQL, des logs réseau et du terminal simulé.
