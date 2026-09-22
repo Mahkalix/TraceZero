@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { evidenceCatalog } from "@/data/chapter-01/evidence";
 import { emails, phishingEmailId } from "@/data/chapter-01/emails";
 import { sessionEvents } from "@/data/chapter-01/network";
@@ -32,6 +32,22 @@ type TerminalLine = {
   output?: string;
 };
 
+type WindowKey = "app" | "notes";
+
+type WindowPosition = {
+  x: number;
+  y: number;
+};
+
+type DragSession = {
+  key: WindowKey;
+  pointerId: number;
+  startX: number;
+  startY: number;
+  originX: number;
+  originY: number;
+};
+
 const signalLabels: Record<PhishingSignal, string> = {
   sender: "expéditeur externe",
   domain: "domaine ressemblant",
@@ -55,6 +71,12 @@ const dockApps: Array<{
 
 const judyPortrait =
   "https://1.bp.blogspot.com/-YF9OOw5rB-U/X9tAimobl0I/AAAAAAAAGEU/t1PHyHLWS_sz09PM7YustUT6GJJDsaKbACPcBGAsYHg/w914-h514-p-k-no-nu/judy-alvarez-cyberpunk-2077-uhdpaper.com-4K-8.2294-wp.thumbnail.jpg";
+const judyWallpaper = "/judy-apartment.jpg";
+
+const defaultWindowPositions: Record<WindowKey, WindowPosition> = {
+  app: { x: 0, y: 0 },
+  notes: { x: 0, y: 0 },
+};
 
 export function InvestigationDesktop({ caseId }: { caseId: string }) {
   const [activeApp, setActiveApp] = useState<ActiveApp>("case");
@@ -68,6 +90,14 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   const [hydrated, setHydrated] = useState(false);
   const [announcement, setAnnouncement] = useState("");
   const [terminalInput, setTerminalInput] = useState("");
+  const [windowPositions, setWindowPositions] =
+    useState<Record<WindowKey, WindowPosition>>(defaultWindowPositions);
+  const [windowLayers, setWindowLayers] = useState<Record<WindowKey, number>>({
+    app: 4,
+    notes: 6,
+  });
+  const topLayerRef = useRef(6);
+  const dragRef = useRef<DragSession | null>(null);
   const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([
     {
       id: 1,
@@ -93,6 +123,104 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   const hasPhishingEvidence = discovered.has("E01") && discovered.has("E02");
   const hasNetworkEvidence = discovered.has("E03") && discovered.has("E04");
   const hypothesisValidated = progress.validatedHypothesisIds.includes("H01");
+
+  function focusWindow(key: WindowKey) {
+    topLayerRef.current += 1;
+    const nextLayer = topLayerRef.current;
+    setWindowLayers((current) => ({ ...current, [key]: nextLayer }));
+  }
+
+  function resetDesktopLayout() {
+    setWindowPositions(defaultWindowPositions);
+    setWindowLayers({ app: 4, notes: 6 });
+    topLayerRef.current = 6;
+    setAnnouncement("Disposition du bureau réinitialisée.");
+  }
+
+  function updateWindowPosition(
+    key: WindowKey,
+    next: WindowPosition,
+  ) {
+    const xLimit = typeof window === "undefined"
+      ? 360
+      : Math.max(120, Math.round(window.innerWidth * 0.32));
+    const yLimit = typeof window === "undefined"
+      ? 180
+      : Math.max(90, Math.round(window.innerHeight * 0.2));
+
+    setWindowPositions((current) => ({
+      ...current,
+      [key]: {
+        x: Math.max(-xLimit, Math.min(xLimit, next.x)),
+        y: Math.max(-yLimit, Math.min(yLimit, next.y)),
+      },
+    }));
+  }
+
+  function beginWindowDrag(
+    key: WindowKey,
+    event: PointerEvent<HTMLElement>,
+  ) {
+    if (event.button !== 0) return;
+
+    focusWindow(key);
+    event.currentTarget.setPointerCapture(event.pointerId);
+    const origin = windowPositions[key];
+
+    dragRef.current = {
+      key,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: origin.x,
+      originY: origin.y,
+    };
+  }
+
+  function moveWindowDrag(event: PointerEvent<HTMLElement>) {
+    const drag = dragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+
+    updateWindowPosition(drag.key, {
+      x: drag.originX + event.clientX - drag.startX,
+      y: drag.originY + event.clientY - drag.startY,
+    });
+  }
+
+  function endWindowDrag(event: PointerEvent<HTMLElement>) {
+    if (dragRef.current?.pointerId === event.pointerId) {
+      dragRef.current = null;
+    }
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  }
+
+  function moveWindowWithKeyboard(
+    key: WindowKey,
+    event: KeyboardEvent<HTMLElement>,
+  ) {
+    const offsets: Record<string, WindowPosition> = {
+      ArrowLeft: { x: -1, y: 0 },
+      ArrowRight: { x: 1, y: 0 },
+      ArrowUp: { x: 0, y: -1 },
+      ArrowDown: { x: 0, y: 1 },
+    };
+
+    const offset = offsets[event.key];
+    if (!offset) return;
+
+    event.preventDefault();
+    focusWindow(key);
+    const step = event.shiftKey ? 48 : 16;
+    const current = windowPositions[key];
+
+    updateWindowPosition(key, {
+      x: current.x + offset.x * step,
+      y: current.y + offset.y * step,
+    });
+  }
 
   function addEvidence(ids: string[]) {
     setProgress((current) => ({
@@ -518,7 +646,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     <main className="judy-os" id="main-content">
       <p className="sr-only" aria-live="polite">{announcement}</p>
 
-      <img className="judy-os__wallpaper" src={judyPortrait} alt="" aria-hidden="true" />
+      <img className="judy-os__wallpaper" src={judyWallpaper} alt="" aria-hidden="true" />
       <div className="judy-os__veil" aria-hidden="true" />
 
       <header className="os-menubar">
@@ -534,6 +662,13 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
         <div className="os-menubar__right">
           <button
             type="button"
+            className="layout-reset"
+            onClick={resetDesktopLayout}
+          >
+            Réinitialiser
+          </button>
+          <button
+            type="button"
             className="notes-toggle"
             aria-pressed={notesOpen}
             onClick={() => setNotesOpen((open) => !open)}
@@ -546,8 +681,25 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
 
       <section className="os-stage" aria-label="Bureau de Judy">
         <div className="window-stack">
-          <div className="app-window" data-app={activeApp}>
-            <header className="app-window__chrome">
+          <div
+            className="app-window draggable-window"
+            data-app={activeApp}
+            onPointerDown={() => focusWindow("app")}
+            style={{
+              transform: `translate3d(${windowPositions.app.x}px, ${windowPositions.app.y}px, 0)`,
+              zIndex: windowLayers.app,
+            }}
+          >
+            <header
+              className="app-window__chrome window-drag-handle"
+              tabIndex={0}
+              aria-label={`Déplacer la fenêtre ${activeMeta.label}. Utilisez les flèches du clavier ou faites glisser.`}
+              onPointerDown={(event) => beginWindowDrag("app", event)}
+              onPointerMove={moveWindowDrag}
+              onPointerUp={endWindowDrag}
+              onPointerCancel={endWindowDrag}
+              onKeyDown={(event) => moveWindowWithKeyboard("app", event)}
+            >
               <div className="window-controls" aria-hidden="true">
                 <span />
                 <span />
@@ -599,8 +751,25 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
           </button>
 
           {notesOpen ? (
-            <aside className="notes-inspector" aria-labelledby="notebook-title">
-              <header className="notes-inspector__header">
+            <aside
+              className="notes-inspector draggable-window"
+              aria-labelledby="notebook-title"
+              onPointerDown={() => focusWindow("notes")}
+              style={{
+                transform: `translate3d(${windowPositions.notes.x}px, ${windowPositions.notes.y}px, 0)`,
+                zIndex: windowLayers.notes,
+              }}
+            >
+              <header
+                className="notes-inspector__header window-drag-handle"
+                tabIndex={0}
+                aria-label="Déplacer le carnet. Utilisez les flèches du clavier ou faites glisser."
+                onPointerDown={(event) => beginWindowDrag("notes", event)}
+                onPointerMove={moveWindowDrag}
+                onPointerUp={endWindowDrag}
+                onPointerCancel={endWindowDrag}
+                onKeyDown={(event) => moveWindowWithKeyboard("notes", event)}
+              >
                 <div>
                   <span className="micro-label">CASE MEMORY</span>
                   <strong id="notebook-title">Carnet</strong>

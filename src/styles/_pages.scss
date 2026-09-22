@@ -10,23 +10,23 @@
 
 .entry-os__wallpaper {
   position: fixed;
-  inset: -3%;
-  width: 106%;
-  height: 106%;
+  inset: -2%;
+  width: 104%;
+  height: 104%;
   object-fit: cover;
-  object-position: center 26%;
-  filter: saturate(0.72) brightness(0.42) contrast(1.06);
-  transform: scale(1.02);
+  object-position: center;
+  filter: saturate(0.94) brightness(0.6) contrast(1.04);
+  transform: scale(1.01);
 }
 
 .entry-os__veil {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(circle at 72% 18%, rgb(29 214 207 / 9%), transparent 28rem),
-    radial-gradient(circle at 24% 72%, rgb(198 68 126 / 10%), transparent 24rem),
-    linear-gradient(180deg, rgb(4 6 8 / 17%), rgb(4 6 8 / 62%));
-  backdrop-filter: blur(1.5px);
+    radial-gradient(circle at 72% 18%, rgb(29 214 207 / 5%), transparent 30rem),
+    radial-gradient(circle at 46% 56%, rgb(198 68 126 / 6%), transparent 26rem),
+    linear-gradient(180deg, rgb(4 6 8 / 8%), rgb(4 6 8 / 46%));
+  backdrop-filter: blur(0.4px);
 }
 
 .entry-menubar {

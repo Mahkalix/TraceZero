@@ -2,13 +2,14 @@ import Link from "next/link";
 
 const judyPortrait =
   "https://1.bp.blogspot.com/-YF9OOw5rB-U/X9tAimobl0I/AAAAAAAAGEU/t1PHyHLWS_sz09PM7YustUT6GJJDsaKbACPcBGAsYHg/w914-h514-p-k-no-nu/judy-alvarez-cyberpunk-2077-uhdpaper.com-4K-8.2294-wp.thumbnail.jpg";
+const judyWallpaper = "/judy-apartment.jpg";
 
 export default function HomePage() {
   return (
     <main className="entry-os" id="main-content">
       <img
         className="entry-os__wallpaper"
-        src={judyPortrait}
+        src={judyWallpaper}
         alt=""
         aria-hidden="true"
       />

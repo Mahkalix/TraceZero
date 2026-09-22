@@ -22,23 +22,23 @@
 
 .judy-os__wallpaper {
   position: fixed;
-  inset: -3%;
-  width: 106%;
-  height: 106%;
+  inset: -2%;
+  width: 104%;
+  height: 104%;
   object-fit: cover;
-  object-position: center 24%;
-  filter: saturate(0.72) brightness(0.42) contrast(1.06);
-  transform: scale(1.02);
+  object-position: center;
+  filter: saturate(0.92) brightness(0.58) contrast(1.04);
+  transform: scale(1.01);
 }
 
 .judy-os__veil {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(circle at 72% 18%, rgb(29 214 207 / 10%), transparent 26rem),
-    radial-gradient(circle at 26% 72%, rgb(198 68 126 / 11%), transparent 24rem),
-    linear-gradient(180deg, rgb(4 6 8 / 20%), rgb(4 6 8 / 60%));
-  backdrop-filter: blur(1.5px);
+    radial-gradient(circle at 72% 18%, rgb(29 214 207 / 6%), transparent 28rem),
+    radial-gradient(circle at 45% 58%, rgb(198 68 126 / 7%), transparent 24rem),
+    linear-gradient(180deg, rgb(4 6 8 / 10%), rgb(4 6 8 / 42%));
+  backdrop-filter: blur(0.4px);
 }
 
 .os-menubar {
@@ -1220,6 +1220,69 @@
 
 @media (max-width: 76rem) {
   .desktop-artifact {
+    display: none;
+  }
+}
+
+.draggable-window {
+  transition: box-shadow 160ms ease;
+  will-change: transform;
+}
+
+.draggable-window:focus-within {
+  box-shadow:
+    0 2rem 6rem rgb(0 0 0 / 38%),
+    inset 0 1px 0 rgb(255 255 255 / 10%);
+}
+
+.window-drag-handle {
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.window-drag-handle:active {
+  cursor: grabbing;
+}
+
+.window-drag-handle:focus-visible {
+  outline: 0.14rem solid rgb(224 231 229 / 72%);
+  outline-offset: -0.22rem;
+}
+
+.layout-reset {
+  border: 0;
+  color: $color-text-subtle;
+  background: transparent;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.58rem;
+  cursor: pointer;
+}
+
+.layout-reset:hover,
+.layout-reset:focus-visible {
+  color: $color-text;
+}
+
+.app-window {
+  transform-origin: center;
+}
+
+.notes-inspector {
+  transform-origin: center;
+}
+
+@media (max-width: 58rem) {
+  .draggable-window {
+    transform: none !important;
+  }
+
+  .window-drag-handle {
+    cursor: default;
+    touch-action: auto;
+  }
+
+  .layout-reset {
     display: none;
   }
 }
