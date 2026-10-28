@@ -63,20 +63,20 @@
   font: 700 clamp(.85rem, 1.3vw, 1.1rem) var(--font-display), sans-serif;
   span { width: 2rem; height: 2rem; background: url('/trace-mark.svg') center / contain no-repeat; }
 }
-.cinema-credit {
-  animation: cinema-leave $cinema-exit-time $cinema-ease $cinema-exit-cue both;
-  padding-inline: 1.5rem;
-  line-height: 1.6;
+.cinema-credit,
+.prologue-credit {
   position: absolute;
-  bottom: clamp(1.5rem, 4vw, 3rem);
-  left: 0;
-  right: 0;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  left: 1.5rem;
+  right: 1.5rem;
   margin: 0;
   text-align: center;
   color: $cinema-muted;
-  font: .8rem var(--font-mono), monospace;
+  font: .7rem var(--font-mono), monospace;
+  line-height: 1.6;
   letter-spacing: .04em;
 }
+.cinema-credit { animation: cinema-leave $cinema-exit-time $cinema-ease $cinema-exit-cue both; }
 .prologue-card {
   width: min(100%, 44rem);
   height: 100%;
@@ -103,6 +103,5 @@
 .volume-row input { min-width: 0; flex: 1; accent-color: $cinema-ink; cursor: pointer; }
 .volume-row output { min-width: 3ch; font: .75rem var(--font-mono), monospace; }
 .prologue-skip { background: none; border: 0; color: inherit; text-decoration: underline; padding: .8rem; cursor: pointer; font: inherit; font-size: .8rem; }
-.prologue-credit { position: absolute; bottom: max(1rem, env(safe-area-inset-bottom)); left: 1.5rem; right: 1.5rem; margin: 0; text-align: center; color: $cinema-muted; font: .7rem var(--font-mono), monospace; line-height: 1.6; }
 @keyframes prologue-reveal { from { opacity: 0; transform: translateY(.5rem); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .prologue-lines p { animation: none !important; } }
