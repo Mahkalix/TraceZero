@@ -1,5 +1,26 @@
 import { expect, test } from "@playwright/test";
 
+test("l’accueil explique le jeu et le bureau Linux occupe l’écran", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Les réponses sont dans les traces." })).toBeVisible();
+  await page.screenshot({ path: "test-results/accueil-linux.png", fullPage: true });
+  await page.getByRole("link", { name: "Ouvrir le bureau" }).click();
+  const wallpaper = page.locator(".judy-os__wallpaper");
+  const bounds = await wallpaper.boundingBox();
+  expect(bounds?.width).toBe(page.viewportSize()?.width);
+  expect(bounds?.height).toBe(page.viewportSize()?.height);
+  await page.getByRole("button", { name: "Agrandir Dossier", exact: true }).click();
+  await expect(page.locator('[data-app="case"]')).toHaveAttribute("data-maximized", "true");
+  await page.screenshot({ path: "test-results/bureau-linux.png", fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Messages", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Revue ORION demain" })).toBeVisible();
+  await page.getByRole("button", { name: "Dossier", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Judy Alvarez" })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: "test-results/bureau-mobile.png", fullPage: true });
+});
+
 test("le joueur peut terminer tout le parcours du dossier 001", async ({ page }) => {
   await page.goto("/");
 
@@ -9,7 +30,7 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
 
   await expect(page.locator("img.judy-os__wallpaper")).toHaveAttribute(
     "src",
-    "/judy-apartment.jpg",
+    "/trace-wallpaper.svg",
   );
 
   await expect(page.getByRole("heading", { name: "Judy Alvarez" })).toBeVisible();

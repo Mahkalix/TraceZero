@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import {
   FormEvent,
@@ -56,9 +57,7 @@ type TerminalLine = {
   output?: string;
 };
 
-const judyPortrait =
-  "https://1.bp.blogspot.com/-YF9OOw5rB-U/X9tAimobl0I/AAAAAAAAGEU/t1PHyHLWS_sz09PM7YustUT6GJJDsaKbACPcBGAsYHg/w914-h514-p-k-no-nu/judy-alvarez-cyberpunk-2077-uhdpaper.com-4K-8.2294-wp.thumbnail.jpg";
-const judyWallpaper = "/judy-apartment.jpg";
+const judyWallpaper = "/trace-wallpaper.svg";
 
 const apps: Array<{
   id: ActiveApp;
@@ -107,6 +106,8 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   const [saveFailed, setSaveFailed] = useState(false);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [restartPending, setRestartPending] = useState(false);
+  const [maximizedApp, setMaximizedApp] = useState<ActiveApp | null>(null);
+  const [clock, setClock] = useState("Session locale");
   const [windowPositions, setWindowPositions] =
     useState<Record<WindowKey, WindowPosition>>(defaultWindowPositions);
   const [windowLayers, setWindowLayers] = useState<Record<WindowKey, number>>({
@@ -129,6 +130,13 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   const windowRefs = useRef<Partial<Record<WindowKey, HTMLElement | null>>>({});
   const dragRef = useRef<DragSession | null>(null);
   const topLayerRef = useRef(20);
+
+  useEffect(() => {
+    const update = () => setClock(new Intl.DateTimeFormat("fr-FR", { weekday: "short", hour: "2-digit", minute: "2-digit" }).format(new Date()));
+    update();
+    const timer = window.setInterval(update, 30000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     setProgress(readProgress());
@@ -198,6 +206,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     setOpenApps(["case"]);
     setMinimizedApps([]);
     setNotesOpen(false);
+    setMaximizedApp(null);
     setActiveApp("case");
     topLayerRef.current = 20;
 
@@ -430,7 +439,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     return (
       <section className="case-home" aria-labelledby="case-title">
         <div className="case-home__portrait">
-          <img src={judyPortrait} alt="" />
+          <div className="case-avatar" aria-label="Profil de Judy Alvarez"><span>JA</span><small>JUDY ALVAREZ</small><em>UTILISATRICE HORS LIGNE</em></div>
         </div>
 
         <div className="case-home__content">
@@ -820,6 +829,8 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     return (
       <div
         className="app-window draggable-window"
+        data-maximized={maximizedApp === app}
+        data-foreground={activeApp === app}
         data-app={app}
         key={app}
         ref={(node) => { windowRefs.current[app] = node; }}
@@ -845,20 +856,23 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
               aria-label={`Fermer ${meta.label}`}
               onPointerDown={(event) => event.stopPropagation()}
               onClick={() => closeApp(app)}
-            />
+            >×</button>
             <button
               type="button"
               aria-label={`Réduire ${meta.label}`}
               onPointerDown={(event) => event.stopPropagation()}
               onClick={() => minimizeApp(app)}
-            />
-            <span aria-hidden="true" />
+            >−</button>
+            <button type="button" aria-label={`${maximizedApp === app ? "Restaurer" : "Agrandir"} ${meta.label}`}
+              aria-pressed={maximizedApp === app}
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={() => setMaximizedApp((current) => current === app ? null : app)}>□</button>
           </div>
           <div className="app-window__identity">
             <span>{meta.glyph}</span>
             <strong>{meta.label}</strong>
           </div>
-          <span className="app-window__code">{meta.code}</span>
+          <span className="app-window__code">~/judy/{app}</span>
         </header>
         <div className="app-window__body">{renderApp(app)}</div>
       </div>
@@ -875,11 +889,11 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
 
       <header className="os-menubar">
         <div className="os-menubar__left">
-          <span className="os-mark" aria-hidden="true">TZ</span>
-          <strong>JUDY-LAPTOP</strong>
+          <img className="trace-logo" src="/trace-mark.svg" alt="" />
+          <strong>TRACE OS</strong><span className="system-host">judy@laptop</span>
         </div>
         <div className="os-menubar__center">
-          <span>{caseComplete ? "trace complete" : `case ${caseId}`}</span>
+          <time>{clock}</time>
         </div>
         <div className="os-menubar__right">
           <button className="layout-reset" type="button" onClick={resetDesktopLayout}>
@@ -897,10 +911,12 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
             Carnet {progress.discoveredEvidenceIds.length}/6
           </button>
           <span className="os-status-dot" aria-hidden="true" />
+          <span className="system-host">LOCAL · 100%</span>
         </div>
       </header>
 
       <section className="os-stage" aria-label="Bureau de Judy">
+        <div className="desktop-identity" aria-hidden="true"><span>TRACE / LINUX</span><strong>L’espace de Judy.</strong><small>Dossier {caseId} · Copie d’investigation</small></div>
         <div className="window-stack">
           {openApps.map(renderWindow)}
 
@@ -999,6 +1015,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       </section>
 
       <nav className="os-dock" aria-label="Applications de Judy">
+        <Link className="dock-home" href="/" aria-label="Accueil Trace Zero"><img className="trace-logo" src="/trace-mark.svg" alt="" /></Link>
         {apps.map((app) => {
           const isOpen = openApps.includes(app.id) && !minimizedApps.includes(app.id);
           return (
