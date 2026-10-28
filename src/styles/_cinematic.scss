@@ -82,5 +82,6 @@
   .story-actions { margin-top: 2rem; }
 }
 .prologue-skip { background: none; border: 0; color: inherit; text-decoration: underline; padding: .8rem; cursor: pointer; font: inherit; font-size: .8rem; }
+.prologue-credit { margin: 2rem 0 0; color: $cinema-muted; font: .75rem var(--font-mono), monospace; line-height: 1.6; }
 @keyframes prologue-reveal { from { opacity: 0; transform: translateY(.5rem); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .prologue-lines p { animation: none !important; } }

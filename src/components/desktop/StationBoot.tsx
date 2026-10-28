@@ -126,6 +126,7 @@ export function StationBoot({ children }: { children?: ReactNode }) {
           <button className="soft-button" type="button" onClick={() => storyPage < prologue.length - 1 ? setStoryPage((page) => page + 1) : complete()}>{storyPage < prologue.length - 1 ? "Continuer" : "Entrer dans le bureau"}</button>
           <button className="prologue-skip" type="button" onClick={() => complete(true)}>Passer le prologue</button>
         </div>
+        <p className="prologue-credit">GitHub · Maxence Badin-Léger aka @Mahkalix</p>
       </div>
     </section> : null}
     <div ref={desktopRef} className="station-content" data-boot-phase={phase} aria-hidden={phase !== "ready"} inert={phase !== "ready"}>
