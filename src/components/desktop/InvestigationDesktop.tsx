@@ -169,16 +169,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   const notebook = notebookState(progress);
   const nextStoryClue = storyClueIds.find((id) => !progress.storyClueIds?.includes(id));
   const selectedStoryClue = storyClues[selectedEmail.id as StoryClueId];
-  const nextAction = nextStoryClue
-    ? { app: "mail" as const, label: "Reconstituer la soirée dans les messages et garder les passages importants dans mon carnet." }
-    : !hasPhishingEvidence
-    ? { app: "mail" as const, label: "Qui pouvait écrire au nom de Judy ? Examiner l’alerte de sécurité reçue à 21 h 52." }
-    : !hypothesisValidated
-      ? { app: "mail" as const, label: "Ouvrir le carnet et valider l’hypothèse de phishing ciblé." }
-      : !hasNetworkEvidence
-        ? { app: "network" as const, label: "Comparer les machines qui utilisent la session S-4831." }
-        : { app: "files" as const, label: "Que voulait protéger Judy ? Lire notes.txt, puis vérifier son archive dans le terminal." };
-
   const lead = caseComplete
     ? { question: "Qu’est-ce que cette soirée nous apprend ?", action: "Lire la conclusion", hint: "Les passages et les traces sont réunis. Retourne au dossier pour faire le point." }
     : nextStoryClue
@@ -539,28 +529,28 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                 <span>12 octobre · le rendez-vous manqué</span>
                 <span>« Max, si on te demande… »</span>
               </div>
-              {progress.discoveredEvidenceIds.length > 0 ? <p className="investigation-next">Prochaine étape · {nextAction.label}</p> : null}
-              <button className="soft-button" type="button" onClick={startInvestigation}>
-                Ouvrir Messages
-              </button>
-              {hasPhishingEvidence ? <button className="soft-button" type="button" onClick={() => {
-                if (nextStoryClue) selectMessage(nextStoryClue);
-                else if (!hypothesisValidated) { setNotebookTab("hypotheses"); setNotesOpen(true); focusWindow("notes"); }
-                else openApp(nextAction.app);
-              }}>Poursuivre l’enquête</button> : null}
+              {!restartPending ? <div className="case-primary-action">
+                <button className="soft-button" type="button" onClick={progress.discoveredEvidenceIds.length || progress.storyClueIds?.length ? followLead : startInvestigation}>
+                  {progress.discoveredEvidenceIds.length || progress.storyClueIds?.length ? "Poursuivre l’enquête" : "Ouvrir Messages"}
+                </button>
+              </div> : null}
             </>
           )}
           <div className="restart-case">
-            <button className="soft-button" type="button" onClick={() => window.dispatchEvent(new Event("trace:prologue"))}>Relire le prologue</button>
-            {restartPending ? <>
+            {restartPending ? <div className="restart-confirmation" role="group" aria-label="Recommencer le dossier">
               <p>Effacer les preuves et recommencer ce dossier ?</p>
+              <div className="story-actions">
               <button className="soft-button" type="button" onClick={() => {
                 setProgress(initialProgress); setSignals([]); setAnalysisOpen(false);
                 setTerminalLines([]); setSelectedFile(null); setRestartPending(false);
                 resetDesktopLayout(); setAnnouncement("Nouvelle enquête commencée.");
               }}>Confirmer le redémarrage</button>
               <button className="soft-button" type="button" onClick={() => setRestartPending(false)}>Annuler</button>
-            </> : <button className="soft-button" type="button" onClick={() => setRestartPending(true)}>Recommencer le dossier</button>}
+              </div>
+            </div> : <details className="case-options"><summary>Options du dossier</summary><div className="story-actions">
+              <button className="soft-button" type="button" onClick={() => window.dispatchEvent(new Event("trace:prologue"))}>Relire le prologue</button>
+              <button className="soft-button" type="button" onClick={() => setRestartPending(true)}>Recommencer le dossier</button>
+            </div></details>}
           </div>
         </div>
       </section>

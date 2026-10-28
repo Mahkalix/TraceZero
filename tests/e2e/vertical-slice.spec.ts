@@ -135,6 +135,7 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
   await page.getByRole("tab", { name: "Hypothèse" }).click();
   await expect(page.getByText(/L’archive diffère de la référence laissée par Judy/)).toBeVisible();
   await page.getByRole("button", { name: "Fermer le carnet" }).click();
+  await page.getByText("Options du dossier", { exact: true }).click();
   await page.getByRole("button", { name: "Recommencer le dossier", exact: true }).click();
   await page.getByRole("button", { name: "Confirmer le redémarrage" }).click();
   await expect(page.getByRole("button", { name: "Carnet 0/6" })).toBeVisible();

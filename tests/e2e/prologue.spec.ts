@@ -91,6 +91,7 @@ test("Max découvre le contexte à son rythme puis peut le relire", async ({ pag
   await expect(page.getByRole("main")).toBeFocused();
   await page.reload();
   await expect(story).toHaveCount(0);
+  await page.getByText("Options du dossier", { exact: true }).click();
   await page.getByRole("button", { name: "Relire le prologue" }).click();
   await expect(story.getByRole("heading")).toHaveText("Tu t’appelles Max.");
   await story.getByRole("button", { name: "Passer le prologue" }).click();
