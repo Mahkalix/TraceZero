@@ -10,11 +10,11 @@ test("la piste guide Max et conserve les passages en avançant", async ({ page }
   await expect(messages.getByRole("heading", { name: "Si on te demande" })).toBeVisible();
   await messages.getByRole("button", { name: "Lire le message de Nora", exact: true }).click();
   await page.getByRole("button", { name: "Carnet 0/6" }).click();
-  await expect(page.getByRole("region", { name: "Piste en cours" })).toContainText("1/4 passages");
+  await expect(page.getByRole("region", { name: "Piste en cours" })).toContainText("Que savait Nora");
   await expect(page.getByRole("region", { name: "Piste en cours" })).toContainText("Que savait Nora");
   await page.reload();
   await page.getByRole("button", { name: "Carnet 0/6" }).click();
-  await expect(page.getByRole("region", { name: "Piste en cours" })).toContainText("1/4 passages");
+  await expect(page.getByRole("region", { name: "Piste en cours" })).toContainText("Que savait Nora");
   await page.getByRole("button", { name: "Suivre cette piste" }).click();
   await expect(messages.getByRole("heading", { name: "Tu es encore au bureau ?", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Carnet 0/6" }).click();
