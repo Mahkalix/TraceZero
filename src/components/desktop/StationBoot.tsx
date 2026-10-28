@@ -117,7 +117,6 @@ export function StationBoot({ children }: { children?: ReactNode }) {
       }
     }}>
       <div className="prologue-card" key={storyPage}>
-        <span className="micro-label">TRACE // ZERO · LA DERNIÈRE SOIRÉE · {storyPage + 1} / {prologue.length}</span>
         <h1>{prologue[storyPage].title}</h1>
         <div className="prologue-lines">{prologue[storyPage].lines.map((line, index) => <p key={line} style={{ animationDelay: `${.2 + index * .45}s` }}>{line}</p>)}</div>
         <div className="story-actions">
