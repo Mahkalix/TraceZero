@@ -570,7 +570,7 @@
 
 .mail-space__reader-header {
   display: flex;
-  align-items: start;
+  align-items: flex-start;
   justify-content: space-between;
   gap: $space-4;
 
@@ -725,7 +725,7 @@
 
 .app-heading {
   display: flex;
-  align-items: start;
+  align-items: flex-start;
   justify-content: space-between;
   gap: $space-4;
 
@@ -1018,7 +1018,7 @@
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   gap: $space-2;
   padding: $space-2;
   border: 1px solid rgb(255 255 255 / 13%);
@@ -1215,4 +1215,19 @@
   .dock-app__label {
     transition: none;
   }
+}
+
+.file-preview {
+  margin: 1rem;
+  padding: 1rem;
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: .75rem;
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .8rem; line-height: 1.7; }
+}
+
+.investigation-next { border-left: 2px solid #94d5c5; padding-left: .8rem; }
+.restart-case { margin-top: 1.5rem; }
+.save-warning {
+  position: fixed; top: 3rem; left: 1rem; right: 1rem; z-index: 300;
+  padding: .75rem 1rem; border-radius: .5rem; background: #45321c; color: #fff0cf;
 }

@@ -62,6 +62,30 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
   await expect(
     timelineWindow.getByText("Empreinte divergente", { exact: true }),
   ).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByText("Piste technique consolidée")).toBeVisible();
+  await page.getByRole("button", { name: "Recommencer le dossier", exact: true }).click();
+  await page.getByRole("button", { name: "Confirmer le redémarrage" }).click();
+  await expect(page.getByRole("button", { name: "Carnet 0/6" })).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Ouvrir Messages" })).toBeVisible();
+});
+
+test("une sauvegarde malformée ne casse pas le bureau", async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("trace-zero:case-001", JSON.stringify({
+    discoveredEvidenceIds: ["E99", null, "E01", "E01"], currentStep: "bad",
+  })));
+  await page.goto("/case/001");
+  await expect(page.getByRole("button", { name: "Carnet 1/6" })).toBeVisible();
+  await page.getByRole("button", { name: "Fichiers", exact: true }).click();
+  await page.getByRole("button", { name: /notes.txt/ }).click();
+  await expect(page.getByText("check active sessions tomorrow", { exact: false })).toBeVisible();
+});
+
+test("un dossier inconnu affiche une page introuvable", async ({ page }) => {
+  const response = await page.goto("/case/999");
+  expect(response?.status()).toBe(404);
 });
 
 test("une fenêtre se déplace fluidement puis peut être rangée", async ({ page }) => {

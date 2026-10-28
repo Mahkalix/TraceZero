@@ -18,6 +18,7 @@ import {
 } from "@/features/investigation/phishing";
 import {
   initialProgress,
+  isCaseComplete,
   readProgress,
   writeProgress,
   type InvestigationProgress,
@@ -103,6 +104,9 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     useState<InvestigationProgress>(initialProgress);
   const [hydrated, setHydrated] = useState(false);
   const [announcement, setAnnouncement] = useState("");
+  const [saveFailed, setSaveFailed] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [restartPending, setRestartPending] = useState(false);
   const [windowPositions, setWindowPositions] =
     useState<Record<WindowKey, WindowPosition>>(defaultWindowPositions);
   const [windowLayers, setWindowLayers] = useState<Record<WindowKey, number>>({
@@ -132,7 +136,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   }, []);
 
   useEffect(() => {
-    if (hydrated) writeProgress(progress);
+    if (hydrated) setSaveFailed(!writeProgress(progress));
   }, [hydrated, progress]);
 
   const selectedEmail = useMemo(
@@ -146,7 +150,14 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   const hasArchiveEvidence = discovered.has("E05");
   const hasHashEvidence = discovered.has("E06");
   const hypothesisValidated = progress.validatedHypothesisIds.includes("H01");
-  const caseComplete = hasHashEvidence;
+  const caseComplete = isCaseComplete(progress);
+  const nextAction = !hasPhishingEvidence
+    ? { app: "mail" as const, label: "Analyser les messages et relever la pression temporelle ainsi que le faux domaine." }
+    : !hypothesisValidated
+      ? { app: "mail" as const, label: "Ouvrir le carnet et valider l’hypothèse de phishing ciblé." }
+      : !hasNetworkEvidence
+        ? { app: "network" as const, label: "Comparer les machines qui utilisent la session S-4831." }
+        : { app: "terminal" as const, label: "Consulter les fichiers puis comparer l’empreinte de l’archive avec sha256sum orion-export.zip." };
 
   function focusWindow(key: WindowKey) {
     topLayerRef.current += 1;
@@ -439,6 +450,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                 <span>6 preuves vérifiées</span>
                 <strong>Piste technique consolidée</strong>
               </div>
+              <p>Le poste a été compromis, mais ces traces ne permettent pas de localiser Judy ni d’identifier l’auteur. Le dossier technique est clos ; sa disparition reste inexpliquée.</p>
               <button className="soft-button" type="button" onClick={() => openApp("timeline")}>
                 Voir la chronologie
               </button>
@@ -453,11 +465,27 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                 <span>Dernière activité · 22:44</span>
                 <span>Copie en lecture seule</span>
               </div>
+              <p className="investigation-next">Prochaine étape · {nextAction.label}</p>
               <button className="soft-button" type="button" onClick={startInvestigation}>
                 Ouvrir Messages
               </button>
+              {hasPhishingEvidence ? <button className="soft-button" type="button" onClick={() => {
+                if (!hypothesisValidated) { setNotebookTab("hypotheses"); setNotesOpen(true); focusWindow("notes"); }
+                else openApp(nextAction.app);
+              }}>Poursuivre l’enquête</button> : null}
             </>
           )}
+          <div className="restart-case">
+            {restartPending ? <>
+              <p>Effacer les preuves et recommencer ce dossier ?</p>
+              <button className="soft-button" type="button" onClick={() => {
+                setProgress(initialProgress); setSignals([]); setAnalysisOpen(false);
+                setTerminalLines([]); setSelectedFile(null); setRestartPending(false);
+                resetDesktopLayout(); setAnnouncement("Nouvelle enquête commencée.");
+              }}>Confirmer le redémarrage</button>
+              <button className="soft-button" type="button" onClick={() => setRestartPending(false)}>Annuler</button>
+            </> : <button className="soft-button" type="button" onClick={() => setRestartPending(true)}>Recommencer le dossier</button>}
+          </div>
         </div>
       </section>
     );
@@ -715,6 +743,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
               type="button"
               onClick={() => {
                 if (row.name === "orion-export.zip") openApp("terminal");
+                else setSelectedFile(row.name);
               }}
             >
               <span className="file-row__icon" aria-hidden="true">□</span>
@@ -724,6 +753,13 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
             </button>
           ))}
         </div>
+
+        {selectedFile ? <article className="file-preview" aria-live="polite">
+          <h3>{selectedFile}</h3>
+          <pre>{selectedFile === "auth.log"
+            ? sessionEvents.map((event) => `${event.time} ${event.device} ${event.sessionId} ${event.event}`).join("\n")
+            : runTerminalCommand(`cat ${selectedFile}`).output.join("\n")}</pre>
+        </article> : null}
 
         <p className="files-hint">
           L’archive ORION mérite une vérification d’intégrité dans le Terminal.
@@ -832,6 +868,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   return (
     <main className="judy-os" id="main-content">
       <p className="sr-only" aria-live="polite">{announcement}</p>
+      {saveFailed ? <p className="save-warning" role="status">Sauvegarde locale indisponible. Gardez cet onglet ouvert pour conserver votre progression.</p> : null}
 
       <img className="judy-os__wallpaper" src={judyWallpaper} alt="" aria-hidden="true" />
       <div className="judy-os__veil" aria-hidden="true" />
@@ -842,7 +879,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
           <strong>JUDY-LAPTOP</strong>
         </div>
         <div className="os-menubar__center">
-          <span>{caseComplete ? "trace complete" : "case 001"}</span>
+          <span>{caseComplete ? "trace complete" : `case ${caseId}`}</span>
         </div>
         <div className="os-menubar__right">
           <button className="layout-reset" type="button" onClick={resetDesktopLayout}>
