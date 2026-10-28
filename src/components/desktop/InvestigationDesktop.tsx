@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { PlayerGuide } from "./PlayerGuide";
+import { SystemStatus } from "./SystemStatus";
 
 import {
   FormEvent,
@@ -892,7 +893,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       <header className="os-menubar">
         <div className="os-menubar__left">
           <img className="trace-logo" src="/trace-mark.svg" alt="" />
-          <strong>TRACE OS</strong><span className="system-host">judy@laptop</span>
+          <strong className="system-brand">TRACE // ZERO</strong>
         </div>
         <div className="os-menubar__center">
           <time>{clock}</time>
@@ -913,8 +914,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
           >
             Carnet {progress.discoveredEvidenceIds.length}/6
           </button>
-          <span className="os-status-dot" aria-hidden="true" />
-          <span className="system-host">LOCAL · 100%</span>
+          <SystemStatus />
         </div>
       </header>
 

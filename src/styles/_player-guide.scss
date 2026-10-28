@@ -1,6 +1,13 @@
 @use "tokens" as *;
 
 .case-home__content h2 { font-family: var(--font-display), var(--font-ui), sans-serif; font-weight: 700; letter-spacing: -.04em; line-height: 1.02; }
+.case-home__content { align-self: start; padding-top: $space-5; }
+.system-brand { font: 700 .9rem var(--font-display), var(--font-ui), sans-serif; letter-spacing: .03em; white-space: nowrap; }
+.system-indicators { display: flex; align-items: center; gap: $space-4; margin-left: $space-2; color: $station-text; }
+.system-wifi { display: flex; align-items: center; }
+.system-wifi svg { display: block; width: 1.3rem; height: 1.15rem; }
+.system-battery { display: flex; align-items: center; gap: $space-2; font: .68rem var(--font-ui), system-ui, sans-serif; white-space: nowrap; }
+.system-battery svg { display: block; width: 1.8rem; height: 1rem; }
 .restart-case > button { background: transparent; border-color: $station-border; color: $station-muted; }
 .player-guide { font-family: var(--font-ui), system-ui, sans-serif; }
 .case-home__portrait { aspect-ratio: 435 / 773; border: 1px solid $station-border; border-radius: $station-radius; }
@@ -21,6 +28,12 @@
 .player-guide__note { padding-top: $space-5; border-top: 1px solid $station-border; font-size: .75rem !important; }
 @supports not (backdrop-filter: blur(1px)) { .player-guide { background: $station-surface; } }
 @media (max-width: 58rem) {
+  .system-brand { font-size: .7rem; letter-spacing: 0; }
+  .system-indicators { gap: $space-2; margin-left: 0; }
+  .system-battery { gap: $space-1; font-size: .6rem; }
+  .system-battery svg { width: 1.5rem; }
+  .system-wifi svg { width: 1rem; }
+  .case-home__content { padding-top: 0; }
   .guide-toggle__label { display: none; }
   .guide-toggle__icon { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border: 1px solid $station-border; border-radius: 50%; }
   .case-home__portrait { width: min(100%, 13rem); justify-self: center; }
