@@ -506,9 +506,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
         </div>
 
         <div className="case-home__content">
-          <span className="micro-label">
-            {caseComplete ? "CHAPITRE 01 / FIN" : "CHAPITRE 01 / LA DERNIÈRE SOIRÉE"}
-          </span>
           <h2 id="case-title">Judy Alvarez</h2>
 
           {caseComplete ? (
@@ -623,7 +620,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
 
             {selectedEmail.displayLink ? (
               <div className="link-inspector">
-                <span className="micro-label">Lien détecté</span>
                 <div><span>affiché</span><strong>{selectedEmail.displayLink}</strong></div>
                 <div><span>réel</span><code>{selectedEmail.actualLink}</code></div>
               </div>
@@ -631,7 +627,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
           </div>
 
           {selectedStoryClue ? <section className="file-preview" aria-label="Réflexion de Max">
-            <span className="micro-label">Max / ce que je retiens</span>
             <p>{selectedStoryClue.detail}</p>
             <div className="story-actions">
             <button className="soft-button" type="button"
@@ -666,7 +661,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
             <section className="analysis-sheet" id="analysis-panel" aria-labelledby="analysis-title">
               <header>
                 <div>
-                  <span className="micro-label">Analyse</span>
                   <h3 id="analysis-title">Quels signaux sont suspects ?</h3>
                 </div>
                 <span>{signals.length} sélectionné{signals.length > 1 ? "s" : ""}</span>
@@ -711,7 +705,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     if (!hypothesisValidated) {
       return (
         <section className="empty-app">
-          <span className="micro-label">Réseau</span>
           <h2>Pas encore.</h2>
           <p>Le réseau ne devient pertinent qu’après avoir confirmé l’hypothèse de phishing.</p>
           <button
@@ -734,7 +727,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
         <p className="investigation-next">Max / Le message de 22 h 47 accuse Nora. Est-ce vraiment Judy qui l’a envoyé ? Ces connexions peuvent montrer qui avait accès à son compte.</p>
         <header className="app-heading">
           <div>
-            <span className="micro-label">Session d’authentification</span>
             <h2 id="network-title">S-4831</h2>
           </div>
           <span className="status-pill status-pill--warning">2 appareils</span>
@@ -777,7 +769,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     if (!hasNetworkEvidence) {
       return (
         <section className="empty-app">
-          <span className="micro-label">Terminal</span>
           <h2>Shell verrouillé.</h2>
           <p>Confirmez l’anomalie réseau avant de fouiller les fichiers.</p>
           <button className="soft-button" type="button" onClick={() => openApp("network")}>
@@ -791,7 +782,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       <section className="terminal-space" aria-labelledby="terminal-title">
         <header className="app-heading">
           <div>
-            <span className="micro-label">Sandbox / lecture seule</span>
             <h2 id="terminal-title">Terminal</h2>
           </div>
         </header>
@@ -840,7 +830,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       <section className="files-space" aria-labelledby="files-title">
         <header className="app-heading">
           <div>
-            <span className="micro-label">Récents</span>
             <h2 id="files-title">Fichiers</h2>
           </div>
         </header>
@@ -895,7 +884,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       <section className="timeline-space" aria-labelledby="timeline-title">
         <header className="app-heading">
           <div>
-            <span className="micro-label">Reconstruction</span>
             <h2 id="timeline-title">Timeline</h2>
           </div>
         </header>
@@ -987,7 +975,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   }
 
   return (
-    <main className="judy-os" id="main-content" tabIndex={-1} aria-label="Bureau forensic, dossier 001">
+    <main className="judy-os" id="main-content" tabIndex={-1} aria-label={`Bureau forensic, dossier ${caseId}`}>
       <p className="sr-only" aria-live="polite">{announcement}</p>
       {announcement && /preuves|Phishing ciblé confirmé|Empreinte divergente/.test(announcement) ? <div key={announcement} className="evidence-notice" aria-hidden="true">{announcement}</div> : null}
       {saveFailed ? <p className="save-warning" role="status">Sauvegarde locale indisponible. Gardez cet onglet ouvert pour conserver votre progression.</p> : null}
@@ -1025,7 +1013,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       </header>
 
       <section className="os-stage" aria-label="Bureau de Judy">
-        <div className="desktop-identity" aria-hidden="true"><span>TRACE / LINUX</span><strong>L’espace de Judy.</strong><small>Dossier {caseId} · Copie d’investigation</small></div>
+        <div className="desktop-identity" aria-hidden="true"><strong>L’espace de Judy.</strong></div>
         <div className="window-stack">
           {openApps.map(renderWindow)}
 
@@ -1051,8 +1039,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                 onKeyDown={(event) => moveWindowWithKeyboard("notes", event)}
               >
                 <div>
-                  <span className="micro-label">Carnet de Max</span>
-                  <strong id="notebook-title">Carnet</strong>
+                  <strong id="notebook-title">Carnet de Max</strong>
                 </div>
                 <button
                   type="button"
@@ -1087,7 +1074,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
               {notebookTab === "leads" ? (
                 <div className="notes-list" role="tabpanel" aria-label="Pistes">
                   <section className="investigation-lead" aria-label="Piste en cours">
-                    <span className="micro-label">Max / {progress.storyClueIds?.length ?? 0}/4 passages · {progress.discoveredEvidenceIds.length}/6 traces</span>
                     <strong>{lead.question}</strong>
                     <div className="story-actions">
                       <button className="soft-button soft-button--small" type="button" onClick={followLead}>{lead.action}</button>
