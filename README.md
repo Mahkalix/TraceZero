@@ -4,6 +4,8 @@ Jeu narratif d'enquête cyber centré sur la disparition de Judy Alvarez.
 
 ## La dernière soirée
 
+Musique d’introduction : boucle synthwave originale générée par Web Audio dans `intro-music.ts` (108 BPM, basse, arpège et percussions synthétiques), sans enregistrement ni sample tiers. Activation explicite via « Activer le son », coupure possible pendant le titre et le prologue, arrêt à l’entrée du bureau. Aucun fichier musical externe ni attribution tierce. Les boutons du prologue restent dans une zone fixe ; le texte dispose de son propre défilement sur les petits écrans.
+
 Après le titre animé, un prologue en quatre écrans présente Max, le rendez-vous manqué, le brouillon et l’objectif de l’enquête. Les phrases apparaissent progressivement ; le joueur avance à son rythme, revient en arrière ou passe le prologue. En mouvement réduit, le texte est immédiat. Le bureau reste inactif pendant la lecture. La clé de session `trace-zero:prologue:v1` est distincte du titre et de la progression ; les sessions existantes voient donc le nouveau contexte. « Relire le prologue » dans le dossier permet de le rouvrir. Les pistes et les indices restent dans l’onglet Pistes du carnet.
 
 Le joueur incarne Max, sans genre imposé. Judy a manqué leur rendez-vous au café ; 36 heures plus tard, son ordinateur révèle un brouillon non envoyé : « Max, si on te demande, je suis partie à 20 h 30. » Nora évoque une lumière allumée à 20 h 31, puis un départ à 22 h 12. À 22 h 47, un message envoyé au nom de Judy accuse Nora et affirme que Judy est toujours au bureau.

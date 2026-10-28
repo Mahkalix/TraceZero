@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { finishBoot, hasBootPlayed, markBootPlayed } from "../../features/presentation/boot-session";
+import { startIntroMusic } from "../../features/presentation/intro-music";
 
 const prologueKey = "trace-zero:prologue:v1";
 const prologue = [
@@ -21,6 +22,30 @@ export function StationBoot({ children }: { children?: ReactNode }) {
   const desktopRef = useRef<HTMLDivElement>(null);
   const completedRef = useRef(false);
   const startedRef = useRef(false);
+  const stopMusic = useRef<(() => void) | null>(null);
+  const musicRequest = useRef(0);
+  const [music, setMusic] = useState<"off" | "loading" | "on" | "error">("off");
+
+  useEffect(() => {
+    if (phase === "ready") {
+      musicRequest.current++;
+      stopMusic.current?.(); stopMusic.current = null; setMusic("off");
+    }
+  }, [phase]);
+  useEffect(() => () => { musicRequest.current++; stopMusic.current?.(); }, []);
+
+  async function toggleMusic() {
+    if (stopMusic.current) { stopMusic.current(); stopMusic.current = null; setMusic("off"); return; }
+    const request = ++musicRequest.current;
+    setMusic("loading");
+    try {
+      const stop = await startIntroMusic();
+      if (request !== musicRequest.current) { stop(); return; }
+      stopMusic.current = stop; setMusic("on");
+    } catch { if (request === musicRequest.current) setMusic("error"); }
+  }
+
+  const soundControl = <button className="intro-audio" type="button" disabled={music === "loading"} aria-pressed={music === "on"} onClick={toggleMusic}>{music === "on" ? "Couper le son" : music === "loading" ? "Activation…" : music === "error" ? "Réessayer le son" : "Activer le son"}</button>;
 
   const complete = useCallback((skipped = false) => {
     if (completedRef.current) return;
@@ -76,15 +101,16 @@ export function StationBoot({ children }: { children?: ReactNode }) {
     if (phase !== "playing") return;
     bootRef.current?.focus();
     const onKey = (event: KeyboardEvent) => {
+      if (event.target instanceof HTMLButtonElement && event.key !== "Escape" && event.key !== "Tab") return;
       if (["Enter", "Escape", " "].includes(event.key)) {
         event.preventDefault();
         if (event.key === "Escape") complete(true); else beginStory();
       }
-      if (event.key === "Tab") { event.preventDefault(); bootRef.current?.focus(); }
+      if (event.key === "Tab") { event.preventDefault(); bootRef.current?.querySelector<HTMLButtonElement>("button")?.focus(); }
     };
     window.addEventListener("keydown", onKey);
-    const onPointer = () => beginStory();
-    window.addEventListener("pointerdown", onPointer, { capture: true, once: true });
+    const onPointer = (event: PointerEvent) => { if (!(event.target instanceof Element && event.target.closest(".intro-audio"))) beginStory(); };
+    window.addEventListener("pointerdown", onPointer, { capture: true });
     return () => {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("pointerdown", onPointer, true);
@@ -94,6 +120,7 @@ export function StationBoot({ children }: { children?: ReactNode }) {
   return <>
     <p className="sr-only" role="status" aria-live="polite">{announcement}</p>
     {phase === "playing" ? <section ref={bootRef} tabIndex={-1} className="station-boot" data-reduced={reduced} role="dialog" aria-modal="true" aria-label="Démarrage de la station forensic">
+      {soundControl}
       <div className="boot-scene" aria-hidden="true">
         <div className="cinema-shutter cinema-shutter--top" />
         <div className="cinema-shutter cinema-shutter--bottom" />
@@ -111,22 +138,27 @@ export function StationBoot({ children }: { children?: ReactNode }) {
     {phase === "story" ? <section ref={storyRef} tabIndex={-1} className="station-boot narrative-prologue" role="dialog" aria-modal="true" aria-label="La dernière soirée — prologue" onKeyDown={(event) => {
       if (event.key === "Escape") { event.preventDefault(); complete(true); }
       if (event.key === "Tab") {
-        const buttons = Array.from(storyRef.current?.querySelectorAll<HTMLButtonElement>("button") ?? []);
+        const buttons = Array.from(storyRef.current?.querySelectorAll<HTMLButtonElement>("button:not(:disabled)") ?? []);
         const first = buttons[0]; const last = buttons[buttons.length - 1];
         if (event.shiftKey && (document.activeElement === first || document.activeElement === storyRef.current)) { event.preventDefault(); last?.focus(); }
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
       }
     }}>
       <div className="prologue-brand"><span aria-hidden="true" /><strong>TRACE // ZERO</strong></div>
-      <div className="prologue-card" key={storyPage}>
+      {soundControl}
+      <div className="prologue-card">
+        <div className="prologue-copy" key={storyPage}>
         <h1>{prologue[storyPage].title}</h1>
         <div className="prologue-lines">{prologue[storyPage].lines.map((line, index) => <p key={line} style={{ animationDelay: `${.2 + index * .45}s` }}>{line}</p>)}</div>
+        </div>
+        <div className="prologue-footer">
         <div className="story-actions">
-          {storyPage > 0 ? <button className="soft-button" type="button" onClick={() => setStoryPage((page) => page - 1)}>Précédent</button> : null}
+          <button className="soft-button" type="button" disabled={storyPage === 0} onClick={() => setStoryPage((page) => page - 1)}>Précédent</button>
           <button className="soft-button" type="button" onClick={() => storyPage < prologue.length - 1 ? setStoryPage((page) => page + 1) : complete()}>{storyPage < prologue.length - 1 ? "Continuer" : "Entrer dans le bureau"}</button>
           <button className="prologue-skip" type="button" onClick={() => complete(true)}>Passer le prologue</button>
         </div>
         <p className="prologue-credit">GitHub · Maxence Badin-Léger aka @Mahkalix</p>
+        </div>
       </div>
     </section> : null}
     <div ref={desktopRef} className="station-content" data-boot-phase={phase} aria-hidden={phase !== "ready"} inert={phase !== "ready"}>

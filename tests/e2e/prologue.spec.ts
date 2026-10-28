@@ -1,5 +1,34 @@
 import { expect, test } from "@playwright/test";
 
+for (const width of [1280, 390]) {
+  test(`les commandes restent fixes sur les quatre pages à ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/case/001');
+    const next = page.getByRole('button', { name: 'Continuer', exact: true });
+    await expect(next).toBeVisible();
+    const initial = await next.boundingBox();
+    for (let step = 0; step < 3; step++) {
+      await next.click();
+      const bounds = await page.getByRole('button', { name: step === 2 ? 'Entrer dans le bureau' : 'Continuer', exact: true }).boundingBox();
+      expect(bounds?.x).toBeCloseTo(initial!.x, 0);
+      expect(bounds?.y).toBeCloseTo(initial!.y, 0);
+    }
+  });
+}
+
+test('le son se lance sans passer le titre et peut être coupé', async ({ page }) => {
+  await page.clock.install();
+  await page.goto('/case/001');
+  await page.getByRole('button', { name: 'Activer le son' }).click();
+  await expect(page.getByRole('button', { name: 'Couper le son' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.station-content')).toHaveAttribute('data-boot-phase', 'playing');
+  await page.clock.runFor(5100);
+  await expect(page.getByRole('button', { name: 'Couper le son' })).toBeVisible();
+  await page.getByRole('button', { name: 'Couper le son' }).click();
+  await expect(page.getByRole('button', { name: 'Activer le son' })).toHaveAttribute('aria-pressed', 'false');
+});
+
 test("le bureau reste masqué entre le titre et le prologue", async ({ page }) => {
   await page.clock.install();
   await page.goto("/case/001");

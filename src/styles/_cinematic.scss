@@ -44,7 +44,7 @@
   pointer-events: auto;
   background: $cinema-bg;
   color: $cinema-ink;
-  overflow-y: auto;
+  overflow: hidden;
   display: flex;
   align-items: safe center;
   justify-content: center;
@@ -77,10 +77,20 @@
 }
 .prologue-card {
   width: min(100%, 44rem);
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
   h1 { font-family: var(--font-display), sans-serif; font-size: clamp(1.8rem, 4.5vw, 3.5rem); line-height: 1.15; margin: 1.5rem 0 2rem; }
   .prologue-lines p { font-size: clamp(1rem, 1.7vw, 1.2rem); line-height: 1.8; animation: prologue-reveal .7s ease both; }
-  .story-actions { margin-top: 2rem; }
+  .story-actions { margin-top: 0; display: grid; grid-template-columns: 1fr 1fr; }
+  .story-actions .soft-button { min-height: 3.5rem; text-align: center; }
+  .prologue-skip { grid-column: 1 / -1; justify-self: center; }
 }
+.prologue-copy { overflow-y: auto; min-height: 0; padding-right: .5rem; }
+.prologue-footer { padding-top: 1rem; background: $cinema-bg; }
+.prologue-footer .prologue-credit { margin-top: .5rem; text-align: center; }
+.intro-audio { position: absolute; top: 1.5rem; right: 1.5rem; z-index: 2; pointer-events: auto; border: 1px solid $cinema-muted; border-radius: 2rem; background: $cinema-bg; color: $cinema-ink; padding: .65rem .85rem; font: .75rem var(--font-mono), monospace; cursor: pointer; }
 .prologue-skip { background: none; border: 0; color: inherit; text-decoration: underline; padding: .8rem; cursor: pointer; font: inherit; font-size: .8rem; }
 .prologue-credit { margin: 2rem 0 0; color: $cinema-muted; font: .75rem var(--font-mono), monospace; line-height: 1.6; }
 @keyframes prologue-reveal { from { opacity: 0; transform: translateY(.5rem); } to { opacity: 1; transform: translateY(0); } }
