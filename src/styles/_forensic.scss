@@ -2,20 +2,22 @@
 
 body { color: $station-text; background: $station-bg; }
 .entry-os, .judy-os { color: $station-text; background: $station-bg url('/judy-apartment.jpg') center / cover fixed; }
-.entry-os__wallpaper, .judy-os__wallpaper { position: absolute; width: 100%; height: 100%; min-height: 100svh; filter: saturate(.9) brightness(.8); }
+.entry-os__wallpaper, .judy-os__wallpaper { position: absolute; width: 100%; height: 100%; min-height: 100svh; filter: saturate(.55) brightness(.8); }
 .entry-os__veil, .judy-os__veil {
   position: absolute;
   background: linear-gradient(90deg, $wallpaper-reading-shade, $wallpaper-shade);
 }
 .entry-menubar, .os-menubar, .os-dock, .app-window, .notes-inspector, .entry-guide {
-  background: $station-glass; border-color: $station-border;
-  backdrop-filter: blur($station-blur); box-shadow: $station-shadow;
+  background: linear-gradient(145deg, $station-glass-highlight, transparent 50%), $station-glass; border-color: $station-border;
+  backdrop-filter: blur($station-blur) saturate(.65); box-shadow: $station-shadow;
 }
 .entry-guide, .app-window, .notes-inspector { border-radius: $station-radius; }
-.app-window__chrome, .notes-inspector__header, .guide-chrome { background: $station-glass; border-color: $station-border; }
-.app-window__body, .mail-space__reader, .analysis-sheet, .case-home__content, .entry-guide__body { background: $station-reading; }
+.app-window__chrome, .notes-inspector__header, .guide-chrome { background: $station-glass-highlight; border-color: $station-border; }
+.app-window__body, .entry-guide__body { background: $station-glass-body; }
+.mail-space__reader, .analysis-sheet, .terminal-space { background: $station-reading; }
+.case-home__content { background: transparent; }
 .app-window[data-foreground="false"] { border-color: $station-reflection; }
-.app-window[data-foreground="true"] { border-color: rgba($color-accent,.5); }
+.app-window[data-foreground="true"] { border-color: rgba($station-text,.3); }
 .entry-card h1, .entry-guide h2, .app-window strong, .case-home h2 { color: $station-text; }
 .entry-card p, .entry-card .entry-explanation, .entry-card small, .entry-guide p, .entry-footer, .system-host,
 .case-home p, .mail-space__body, .mail-space__meta, .case-home .micro-label, .case-home__meta span,

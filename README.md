@@ -76,7 +76,7 @@ Les versions de PostCSS et Sharp sont corrigées via `overrides` pour conserver 
 
 ## Direction artistique forensic
 
-DÉCISION : accent unique `#D3E97A`, matériaux sombres neutres, Manrope pour les textes, Source Code Pro pour les métadonnées et Chakra Petch pour le titre animé. Le fond cyberpunk original est restauré, avec des voiles sombres et le jaune conservé. Les valeurs de couleur, flou et durée sont centralisées dans `_tokens.scss`. La couche `_forensic.scss` distingue les surfaces de lecture à 96 % d’opacité du chrome en verre à 76 %, avec un fallback opaque sans backdrop-filter.
+DÉCISION : accent unique `#D3E97A`, matériaux sombres neutres, Manrope pour les textes, Source Code Pro pour les métadonnées et Chakra Petch pour le titre animé. Le fond cyberpunk original est restauré, avec des voiles sombres et le jaune conservé. Les valeurs de couleur, flou et durée sont centralisées dans `_tokens.scss`. Le verre utilise des gris neutres, un flou de 40 px, des reflets blancs et un chrome à 48 % d’opacité. Les emails, le terminal et l’analyse conservent un fond de lecture à 90 %, avec un fallback opaque sans backdrop-filter.
 
 Le composant `StationBoot` présente une séquence CSS de cinq secondes à la première ouverture du bureau par session. Sa direction s’inspire du rythme typographique de [1minus1](https://1minus1.com/) : titre monumental plein/contour, lettres révélées en décalé, monogramme à deux barres, puis ouverture en deux volets sur le bureau. Les textes et les éléments graphiques sont propres à Trace//Zero. Aucun bouton Passer n’est affiché. Les touches Entrée, Échap et Espace permettent toujours d’interrompre la séquence. Un geste pointeur l’interrompt également pour laisser le bureau réagir immédiatement. Un bouton discret permet de la rejouer. La session utilise une clé sessionStorage séparée ; la progression de jeu et son localStorage ne changent pas.
 
@@ -84,7 +84,7 @@ En mouvement réduit, la présentation devient un titre statique de 300 ms, sans
 
 HYPOTHÈSE À TESTER : cette séparation entre chrome transparent et lecture opaque préserve l’ambiance sans augmenter la fatigue visuelle.
 
-Contrastes calculés par luminance relative sRGB sur des couples **opaques** : `#EDF1F4` sur `#141C25` : 15,12:1 ; `#B5C0CB` sur `#141C25` : 9,30:1 ; `#D3E97A` sur `#141C25` : 12,85:1 ; `#10150B` sur `#D3E97A` : 13,85:1. Ces calculs ne couvrent pas la composition réelle de tous les fonds en verre : **non mesuré** pour chaque fond.
+Les matériaux ont été neutralisés pour retirer la dominante bleue. Les anciens calculs de contraste ne s’appliquent plus à cette palette : **non mesuré** pour les nouveaux fonds et leur composition réelle.
 
 Non vérifiés : lecteur d’écran réel, zoom 200 %, contrastes sur chaque fond et performance sur mobile bas de gamme. Les tests navigateur couvrent Chromium, pas Safari ni Firefox. Les captures ne constituent pas une validation d’accessibilité.
 
