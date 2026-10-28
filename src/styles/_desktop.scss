@@ -1248,7 +1248,7 @@
 }
 
 .investigation-next { border-left: 2px solid $material-25; padding-left: .8rem; }
-.restart-case { margin-top: 1.5rem; }
+.restart-case { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
 .save-warning {
   position: fixed; top: 3rem; left: 1rem; right: 1rem; z-index: 300;
   padding: .75rem 1rem; border-radius: .5rem; background: $material-26; color: $material-27;
