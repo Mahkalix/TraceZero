@@ -1,0 +1,33 @@
+import { expect, test } from "@playwright/test";
+
+test("l’analyse explique les erreurs et les preuves partielles", async ({ page }) => {
+  await page.goto("/case/001");
+  await page.getByRole("button", { name: "Ouvrir Messages" }).click();
+  await page.getByRole("button", { name: /ACTION REQUISE/ }).click();
+  await page.getByRole("button", { name: "Analyser ce message" }).click();
+  await page.getByRole("button", { name: "Valider l’analyse" }).click();
+  await expect(page.locator(".analysis-sheet").getByRole("alert")).toContainText("Sélectionnez au moins deux");
+  await page.locator(".analysis-sheet").screenshot({ path: "test-results/analysis-error.png" });
+  await page.getByRole("checkbox", { name: "domaine ressemblant" }).check();
+  await page.getByRole("button", { name: "Valider l’analyse" }).click();
+  await expect(page.locator(".analysis-sheet").getByRole("alert")).toContainText("Un seul signal");
+  await page.getByRole("checkbox", { name: "expéditeur externe" }).check();
+  await page.getByRole("button", { name: "Valider l’analyse" }).click();
+  await expect(page.locator(".analysis-feedback")).toContainText("Une preuve ajoutée");
+  await expect(page.getByRole("button", { name: "Carnet 1/6" })).toBeVisible();
+  await page.getByRole("button", { name: "Valider l’analyse" }).click();
+  await expect(page.locator(".analysis-feedback")).toContainText("déjà dans le carnet");
+  await page.getByRole("checkbox", { name: "pression temporelle" }).check();
+  await page.getByRole("button", { name: "Valider l’analyse" }).click();
+  await expect(page.locator(".analysis-feedback")).toContainText("1 nouvelle preuve");
+  await expect(page.getByRole("button", { name: "Carnet 2/6" })).toBeVisible();
+});
+
+test("un message ordinaire donne un retour visible et aucune preuve", async ({ page }) => {
+  await page.goto("/case/001");
+  await page.getByRole("button", { name: "Ouvrir Messages" }).click();
+  await page.getByRole("button", { name: "Analyser ce message" }).click();
+  await page.getByRole("button", { name: "Valider l’analyse" }).click();
+  await expect(page.locator(".analysis-feedback")).toContainText("ne sont pas confirmés");
+  await expect(page.getByRole("button", { name: "Carnet 0/6" })).toBeVisible();
+});

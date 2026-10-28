@@ -98,6 +98,8 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   const [activeApp, setActiveApp] = useState<ActiveApp>("case");
   const [selectedEmailId, setSelectedEmailId] = useState(emails[0].id);
   const [analysisOpen, setAnalysisOpen] = useState(false);
+  const [analysisFeedback, setAnalysisFeedback] = useState<{ kind: "error" | "success" | "info"; message: string; attempt: number } | null>(null);
+  const analysisFeedbackRef = useRef<HTMLParagraphElement>(null);
   const [signals, setSignals] = useState<PhishingSignal[]>([]);
   const [notebookTab, setNotebookTab] = useState<NotebookTab>("evidence");
   const [notesOpen, setNotesOpen] = useState(false);
@@ -354,6 +356,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   }
 
   function toggleSignal(signal: PhishingSignal) {
+    setAnalysisFeedback(null);
     setSignals((current) =>
       current.includes(signal)
         ? current.filter((item) => item !== signal)
@@ -362,23 +365,33 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   }
 
   function validateAnalysis() {
+    const feedback = (kind: "error" | "success" | "info", message: string) => {
+      setAnalysisFeedback((current) => ({ kind, message, attempt: (current?.attempt ?? 0) + 1 }));
+      window.requestAnimationFrame(() => analysisFeedbackRef.current?.scrollIntoView({ block: "nearest" }));
+    };
     if (selectedEmail.id !== phishingEmailId) {
-      setAnnouncement("Rien de suffisamment anormal sur ce message.");
+      feedback("info", "Ces signaux ne sont pas confirmés dans ce message. Comparez l’expéditeur, le lien et le contenu avec les autres emails.");
       return;
     }
 
     const result = analyzePhishingSignals(signals);
 
     if (!result.isEnough) {
-      setAnnouncement("Deux indices sont nécessaires.");
+      feedback("error", signals.length === 0 ? "Sélectionnez au moins deux signaux suspects avant de valider l’analyse." : "Un seul signal est sélectionné. Relevez au moins un autre indice dans ce message.");
       return;
     }
 
     addEvidence(result.evidenceIds);
+    const newCount = result.evidenceIds.filter((id) => !discovered.has(id)).length;
+    if (result.evidenceIds.length < 2) {
+      feedback("info", `${newCount ? "Une preuve ajoutée au carnet." : "Cette preuve est déjà dans le carnet."} Ces signaux pointent vers le même domaine suspect. Cherchez aussi comment le message essaie de vous faire agir.`);
+      return;
+    }
+    feedback("success", newCount ? `${newCount} nouvelle${newCount > 1 ? "s" : ""} preuve${newCount > 1 ? "s" : ""} ajoutée${newCount > 1 ? "s" : ""} au carnet. Vous pouvez y valider l’hypothèse de phishing ciblé.` : "Ces preuves sont déjà dans le carnet. Vous pouvez y consulter ou valider l’hypothèse de phishing ciblé.");
     setNotebookTab("evidence");
     setNotesOpen(true);
     focusWindow("notes");
-    setAnnouncement("Deux preuves ont été ajoutées au carnet.");
+    setAnnouncement("Analyse terminée. Consultez le carnet pour valider l’hypothèse.");
   }
 
   function validateHypothesis() {
@@ -520,6 +533,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                 onClick={() => {
                   setSelectedEmailId(email.id);
                   setAnalysisOpen(false);
+                  setAnalysisFeedback(null);
                   setSignals([]);
                 }}
                 type="button"
@@ -600,9 +614,12 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                 )}
               </fieldset>
 
+              <p className="analysis-hint">Sélectionnez au moins deux signaux, puis validez votre analyse.</p>
+
               <button className="soft-button" type="button" onClick={validateAnalysis}>
                 Valider l’analyse
               </button>
+              {analysisFeedback ? <p ref={analysisFeedbackRef} key={analysisFeedback.attempt} className="analysis-feedback" data-kind={analysisFeedback.kind} role={analysisFeedback.kind === "error" ? "alert" : "status"} aria-atomic="true"><strong>{analysisFeedback.kind === "error" ? "Analyse incomplète" : analysisFeedback.kind === "success" ? "Analyse confirmée" : "À vérifier"}</strong>{analysisFeedback.message}</p> : null}
             </section>
           ) : null}
         </article>
