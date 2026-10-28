@@ -56,6 +56,7 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
   await page.getByRole("button", { name: "Analyser ce message" }).click();
   await page.getByRole("checkbox", { name: "pression temporelle" }).check();
   await page.getByRole("checkbox", { name: "domaine ressemblant" }).check();
+  await page.locator(".analysis-sheet").screenshot({ path: "test-results/analysis-glass.png" });
   await page.getByRole("button", { name: "Valider l’analyse" }).click();
 
   await expect(page.getByText("Pression temporelle", { exact: true })).toBeVisible();

@@ -14,7 +14,13 @@ body { color: $station-text; background: $station-bg; }
 .entry-guide, .app-window, .notes-inspector { border-radius: $station-radius; }
 .app-window__chrome, .notes-inspector__header, .guide-chrome { background: $station-glass-highlight; border-color: $station-border; }
 .app-window__body, .entry-guide__body { background: $station-glass-body; }
-.mail-space__reader, .analysis-sheet, .terminal-space { background: $station-reading; }
+.terminal-space { background: $station-reading; }
+.mail-space__reader { background: $station-mail-glass; }
+.analysis-sheet { background: linear-gradient(135deg, $station-glass-highlight, transparent 65%), $station-analysis-glass; border-color: $station-border; box-shadow: inset 0 1px 0 $station-reflection; }
+.analysis-choice { background: $station-choice-glass; color: $station-text; border: 1px solid transparent; }
+.analysis-choice:has(input:checked) { background: $station-choice-selected; border-color: $station-border; color: $station-text; }
+.analysis-choice input { accent-color: $color-accent; }
+.analysis-sheet > header > span { color: $station-muted; }
 .case-home__content { background: transparent; }
 .app-window[data-foreground="false"] { border-color: $station-reflection; }
 .app-window[data-foreground="true"] { border-color: rgba($station-text,.3); }
@@ -36,6 +42,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, [tabindex]:focus-vis
 @supports not (backdrop-filter: blur($blur-93)) {
   .entry-menubar, .os-menubar, .os-dock, .app-window, .notes-inspector, .entry-guide,
   .app-window__chrome, .notes-inspector__header, .guide-chrome { background: $station-chrome; }
+  .mail-space__reader, .analysis-sheet { background: $station-surface; }
 }
 
 .station-content { position: relative; --boot-duration-ms: #{$boot-duration-ms}; --boot-reduced-ms: #{$boot-reduced-ms}; }
