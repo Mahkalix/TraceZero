@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+test.use({ video: { mode: "on", size: { width: 1280, height: 720 } } });
 
 test("démarrage une fois par session, passage clavier et focus sur le bureau", async ({ page }) => {
   await page.goto("/case/001");
@@ -48,4 +49,26 @@ test("recharger pendant le boot ne relance pas la séquence", async ({ page }) =
   await page.reload();
   await expect(page.locator(".station-content")).toHaveAttribute("data-boot-phase", "ready");
   await expect(page.getByRole("dialog")).toHaveCount(0);
+});
+
+test("la composition cinématique reste cadrée sur ordinateur et mobile", async ({ page }) => {
+  await page.clock.install();
+  await page.goto("/case/001");
+  await expect(page.getByRole("dialog")).toBeVisible();
+  const frame = async () => page.evaluate(() => {
+    document.getAnimations().forEach((animation) => {
+      animation.pause();
+      animation.currentTime = 3300;
+    });
+  });
+  await frame();
+  await page.screenshot({ path: "test-results/cinematic-desktop.png" });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await frame();
+  await page.screenshot({ path: "test-results/cinematic-mobile.png" });
+  const title = await page.locator(".cinema-title").boundingBox();
+  expect(title?.x).toBeGreaterThanOrEqual(0);
+  expect((title?.x ?? 0) + (title?.width ?? 0)).toBeLessThanOrEqual(390);
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("main")).toBeFocused();
 });

@@ -66,14 +66,23 @@ export function StationBoot({ children }: { children?: ReactNode }) {
     {phase === "playing" ? <section className="station-boot" data-reduced={reduced} role="dialog" aria-modal="true" aria-label="Démarrage de la station forensic">
       <button ref={skipRef} className="boot-skip" onClick={() => complete(true)} type="button">Passer <span aria-hidden="true">[ Échap ]</span></button>
       <div className="boot-scene" aria-hidden="true">
-        <div className="boot-grid" />
-        <div className="boot-console">
-          <span className="boot-caption">TRACE OS / FORENSIC STATION</span>
-          <div className="boot-lines"><p>BIOS / STATION LOCALE <span>OK</span></p><p>INTÉGRITÉ / COPIE EN LECTURE SEULE <span>OK</span></p><p>MONTAGE / DOSSIER 001 <span>OK</span></p></div>
-          <div className="boot-brand"><span className="boot-symbol">{"//"}</span><strong>Trace<span>{"//"}</span>Zero</strong><small>LES RÉPONSES SONT DANS LES TRACES.</small></div>
-          <div className="boot-panels"><span /><span /><span /></div>
+        <div className="cinema-shutter cinema-shutter--top" />
+        <div className="cinema-shutter cinema-shutter--bottom" />
+        <div className="cinema-composition">
+          <div className="cinema-topline"><span>TRACE OS®</span><span>FORENSIC EXPERIENCE / VOL. 001</span></div>
+          <div className="cinema-emblem"><span /><span /></div>
+          <div className="cinema-title">
+            <div className="cinema-word cinema-word--trace">{"TRACE".split("").map((letter, index) => <span key={index}><b>{letter}</b></span>)}</div>
+            <div className="cinema-word cinema-word--zero">{"ZERO".split("").map((letter, index) => <span key={index}><b>{letter}</b></span>)}</div>
+          </div>
+          <div className="cinema-cross cinema-cross--one">+</div><div className="cinema-cross cinema-cross--two">+</div>
+          <div className="cinema-bottom">
+            <div className="cinema-counter"><span className="cinema-counter__window"><span className="cinema-counter__reel">{["000", "018", "041", "067", "089", "100"].map((value) => <b key={value}>{value}</b>)}</span></span><span className="cinema-counter__unit">/ 100<br />DOSSIER CHARGÉ</span></div>
+            <div className="cinema-story"><span>UNE DISPARITION.</span><span>DES TRACES.</span><strong>VOTRE ENQUÊTE.</strong></div>
+          </div>
+          <div className="cinema-progress"><span /></div>
+          <div className="cinema-coordinate">JUDY ALVAREZ / DERNIÈRE ACTIVITÉ 22:44</div>
         </div>
-        <div className="boot-scan" />
       </div>
       {reduced ? <p className="boot-static">Trace//Zero · Dossier 001 prêt</p> : null}
     </section> : null}

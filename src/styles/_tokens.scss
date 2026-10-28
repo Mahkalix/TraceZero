@@ -212,3 +212,20 @@ $material-146: rgb(226 232 230 / 94%);
 
 $boot-duration-ms: 5000;
 $boot-reduced-ms: 300;
+
+// Cinematic title sequence: deliberate holds, then a single shutter reveal.
+$cinema-bg: #0B1016;
+$cinema-ink: #D3E97A;
+$cinema-muted: #B5C0CB;
+$cinema-stroke: rgba($cinema-ink,.22);
+$cinema-ease: cubic-bezier(.76,0,.24,1);
+$cinema-type-time: 900ms;
+$cinema-first-cue: 550ms;
+$cinema-second-cue: 1450ms;
+$cinema-letter-step: 65ms;
+$cinema-exit-cue: 4200ms;
+$cinema-exit-time: 800ms;
+$cinema-counter-time: 3300ms;
+$cinema-story-cue: 2400ms;
+$cinema-type-size: clamp(5rem, 21vw, 26rem);
+$cinema-type-mobile: clamp(4.5rem, 26vw, 13rem);
