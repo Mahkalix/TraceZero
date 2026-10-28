@@ -1,7 +1,8 @@
 @use "tokens" as *;
 
 // The title is a graphic composition. Every moving layer uses transform/opacity.
-.station-boot { background: transparent; }
+.station-boot { background: $cinema-bg; }
+.station-content:not([data-boot-phase="ready"]) { visibility: hidden; }
 .station-boot:focus { outline: none; box-shadow: none; }
 .boot-scene { display: block; }
 .cinema-shutter { position: absolute; left: 0; right: 0; height: 51%; background: $cinema-bg; }

@@ -1,5 +1,19 @@
 import { expect, test } from "@playwright/test";
 
+test("le bureau reste masqué entre le titre et le prologue", async ({ page }) => {
+  await page.clock.install();
+  await page.goto("/case/001");
+  await expect(page.locator('.station-content')).toHaveAttribute('data-boot-phase', 'playing');
+  await page.clock.runFor(4500);
+  await expect(page.locator('.station-content')).toHaveCSS('visibility', 'hidden');
+  await expect(page.locator('.station-boot')).toHaveCSS('background-color', 'rgb(17, 17, 18)');
+  await page.clock.runFor(600);
+  await expect(page.getByRole('dialog', { name: 'La dernière soirée — prologue' })).toBeVisible();
+  await expect(page.locator('.station-content')).toHaveCSS('visibility', 'hidden');
+  await page.getByRole('button', { name: 'Passer le prologue' }).click();
+  await expect(page.locator('.station-content')).toHaveCSS('visibility', 'visible');
+});
+
 test("Max découvre le contexte à son rythme puis peut le relire", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/case/001");
