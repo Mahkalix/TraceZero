@@ -54,7 +54,7 @@
 .prologue-brand {
   position: absolute;
   top: clamp(1.25rem, 3vw, 2.5rem);
-  right: clamp(1.5rem, 4vw, 3rem);
+  left: clamp(1.5rem, 4vw, 3rem);
   display: flex;
   align-items: center;
   gap: .65rem;
