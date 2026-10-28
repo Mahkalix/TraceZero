@@ -24,6 +24,7 @@ body { color: $station-text; background: $station-bg; }
 .analysis-hint { color: $station-muted; font-size: .75rem; line-height: 1.6; }
 .analysis-feedback { display: grid; gap: $space-2; margin: $space-4 0 0; padding: $space-4; border: 1px solid $station-border; border-left: 3px solid $color-accent; border-radius: $radius-lg; color: $station-text; background: $station-mail-glass; font-size: .82rem; line-height: 1.6; }
 .analysis-feedback strong { color: $color-accent; font-size: .75rem; }
+.analysis-feedback ul { margin: 0; padding-left: $space-5; display: grid; gap: $space-2; }
 .case-home__content { background: transparent; }
 .app-window[data-foreground="false"] { border-color: $station-reflection; }
 .app-window[data-foreground="true"] { border-color: rgba($station-text,.3); }

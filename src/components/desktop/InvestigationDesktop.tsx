@@ -98,8 +98,8 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   const [activeApp, setActiveApp] = useState<ActiveApp>("case");
   const [selectedEmailId, setSelectedEmailId] = useState(emails[0].id);
   const [analysisOpen, setAnalysisOpen] = useState(false);
-  const [analysisFeedback, setAnalysisFeedback] = useState<{ kind: "error" | "success" | "info"; message: string; attempt: number } | null>(null);
-  const analysisFeedbackRef = useRef<HTMLParagraphElement>(null);
+  const [analysisFeedback, setAnalysisFeedback] = useState<{ kind: "error" | "success" | "info"; message: string; details?: string[]; attempt: number } | null>(null);
+  const analysisFeedbackRef = useRef<HTMLDivElement>(null);
   const [signals, setSignals] = useState<PhishingSignal[]>([]);
   const [notebookTab, setNotebookTab] = useState<NotebookTab>("evidence");
   const [notesOpen, setNotesOpen] = useState(false);
@@ -365,12 +365,22 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   }
 
   function validateAnalysis() {
-    const feedback = (kind: "error" | "success" | "info", message: string) => {
-      setAnalysisFeedback((current) => ({ kind, message, attempt: (current?.attempt ?? 0) + 1 }));
+    const feedback = (kind: "error" | "success" | "info", message: string, details?: string[]) => {
+      setAnalysisFeedback((current) => ({ kind, message, details, attempt: (current?.attempt ?? 0) + 1 }));
       window.requestAnimationFrame(() => analysisFeedbackRef.current?.scrollIntoView({ block: "nearest" }));
     };
     if (selectedEmail.id !== phishingEmailId) {
-      feedback("info", "Ces signaux ne sont pas confirmés dans ce message. Comparez l’expéditeur, le lien et le contenu avec les autres emails.");
+      if (!signals.length) {
+        feedback("error", "Cochez les signaux que vous pensez avoir repérés dans ce message avant de valider.");
+        return;
+      }
+      const explanations: Record<PhishingSignal, string> = {
+        sender: `Expéditeur externe : non. L’adresse ${selectedEmail.from} utilise le domaine interne helix.example.`,
+        domain: "Domaine ressemblant : aucun domaine d’imitation n’est présent dans ce message.",
+        link: "Destination réelle différente : aucun lien n’est présent dans ce message, il n’y a donc pas de destination à comparer.",
+        urgency: "Pression temporelle : le message n’impose ni délai court ni menace de suspension de compte.",
+      };
+      feedback("info", `Aucune preuve ajoutée pour « ${selectedEmail.subject} ». Les cases cochées ne correspondent pas aux éléments de cet email.`, signals.map((signal) => explanations[signal]));
       return;
     }
 
@@ -598,6 +608,8 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                 <span>{signals.length}/4</span>
               </header>
 
+              <p className="analysis-hint">Message analysé : <strong>{selectedEmail.subject}</strong></p>
+
               <fieldset>
                 <legend className="sr-only">Indices observés</legend>
                 {(Object.entries(signalLabels) as [PhishingSignal, string][]).map(
@@ -619,7 +631,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
               <button className="soft-button" type="button" onClick={validateAnalysis}>
                 Valider l’analyse
               </button>
-              {analysisFeedback ? <p ref={analysisFeedbackRef} key={analysisFeedback.attempt} className="analysis-feedback" data-kind={analysisFeedback.kind} role={analysisFeedback.kind === "error" ? "alert" : "status"} aria-atomic="true"><strong>{analysisFeedback.kind === "error" ? "Analyse incomplète" : analysisFeedback.kind === "success" ? "Analyse confirmée" : "À vérifier"}</strong>{analysisFeedback.message}</p> : null}
+              {analysisFeedback ? <div ref={analysisFeedbackRef} key={analysisFeedback.attempt} className="analysis-feedback" data-kind={analysisFeedback.kind} role={analysisFeedback.kind === "error" ? "alert" : "status"} aria-atomic="true"><strong>{analysisFeedback.kind === "error" ? "Analyse incomplète" : analysisFeedback.kind === "success" ? "Analyse confirmée" : "Résultat de l’analyse"}</strong><span>{analysisFeedback.message}</span>{analysisFeedback.details ? <ul>{analysisFeedback.details.map((detail) => <li key={detail}>{detail}</li>)}</ul> : null}</div> : null}
             </section>
           ) : null}
         </article>
