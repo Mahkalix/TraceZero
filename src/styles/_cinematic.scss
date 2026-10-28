@@ -49,6 +49,29 @@
   align-items: safe center;
   justify-content: center;
   padding: clamp(1.5rem, 6vw, 5rem);
+  padding-top: max(6rem, 6vw);
+}
+.prologue-brand {
+  position: absolute;
+  top: clamp(1.25rem, 3vw, 2.5rem);
+  right: clamp(1.5rem, 4vw, 3rem);
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  color: $cinema-ink;
+  font: 700 clamp(.85rem, 1.3vw, 1.1rem) var(--font-display), sans-serif;
+  span { width: 2rem; height: 2rem; background: url('/trace-mark.svg') center / contain no-repeat; }
+}
+.cinema-credit {
+  position: absolute;
+  bottom: clamp(1.5rem, 4vw, 3rem);
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  color: $cinema-muted;
+  font: .8rem var(--font-mono), monospace;
+  letter-spacing: .04em;
 }
 .prologue-card {
   width: min(100%, 44rem);
