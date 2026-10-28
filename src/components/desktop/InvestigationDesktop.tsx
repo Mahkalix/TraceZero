@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { PlayerGuide } from "./PlayerGuide";
 
 import {
   FormEvent,
@@ -439,7 +440,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     return (
       <section className="case-home" aria-labelledby="case-title">
         <div className="case-home__portrait">
-          <div className="case-avatar" aria-label="Profil de Judy Alvarez"><span>JA</span><small>JUDY ALVAREZ</small><em>UTILISATRICE HORS LIGNE</em></div>
+          <img src="/judy-alvarez.png" alt="Portrait de Judy Alvarez" />
         </div>
 
         <div className="case-home__content">
@@ -474,7 +475,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                 <span>Dernière activité · 22:44</span>
                 <span>Copie en lecture seule</span>
               </div>
-              <p className="investigation-next">Prochaine étape · {nextAction.label}</p>
+              {progress.discoveredEvidenceIds.length > 0 ? <p className="investigation-next">Prochaine étape · {nextAction.label}</p> : null}
               <button className="soft-button" type="button" onClick={startInvestigation}>
                 Ouvrir Messages
               </button>
@@ -897,6 +898,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
           <time>{clock}</time>
         </div>
         <div className="os-menubar__right">
+          <PlayerGuide />
           <button className="layout-reset" type="button" onClick={resetDesktopLayout}>
             Ranger
           </button>

@@ -1,0 +1,28 @@
+@use "tokens" as *;
+
+.case-home__content h2 { font-family: var(--font-display), var(--font-ui), sans-serif; font-weight: 700; letter-spacing: -.04em; line-height: 1.02; }
+.restart-case > button { background: transparent; border-color: $station-border; color: $station-muted; }
+.player-guide { font-family: var(--font-ui), system-ui, sans-serif; }
+.case-home__portrait { aspect-ratio: 435 / 773; border: 1px solid $station-border; border-radius: $station-radius; }
+.case-home__portrait img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
+.guide-toggle { padding: $space-2; border: 0; background: transparent; color: $station-muted; cursor: pointer; font: .72rem var(--font-mono), monospace; }
+.guide-toggle__icon { display: none; }
+.player-guide { width: min(34rem, calc(100% - 2rem)); max-height: calc(100svh - 3rem); padding: 0; overflow-y: auto; border: 1px solid $station-border; border-radius: $station-radius; color: $station-text; background: $station-reading; box-shadow: $station-shadow; backdrop-filter: blur($station-blur); }
+.player-guide::backdrop { background: rgba($station-bg,.65); }
+.player-guide__chrome { display: flex; justify-content: space-between; align-items: center; padding: $space-3 $space-5; border-bottom: 1px solid $station-border; color: $station-muted; font: .7rem var(--font-mono), monospace; }
+.player-guide__chrome button { border: 0; border-radius: $radius-sm; width: 2rem; height: 2rem; background: $station-glass-highlight; color: $station-text; cursor: pointer; font-size: 1.2rem; }
+.player-guide__body { padding: $space-6; }
+.player-guide h2 { margin: 0 0 $space-5; font-size: 1.8rem; font-weight: 500; letter-spacing: -.04em; }
+.player-guide p { color: $station-muted; font-size: .9rem; line-height: 1.75; }
+.player-guide ol { margin: $space-6 0; padding-left: $space-5; display: grid; gap: $space-5; }
+.player-guide li { padding-left: $space-2; }
+.player-guide li::marker { color: $color-accent; font-family: var(--font-mono), monospace; }
+.player-guide li p { margin: $space-2 0 0; }
+.player-guide__note { padding-top: $space-5; border-top: 1px solid $station-border; font-size: .75rem !important; }
+@supports not (backdrop-filter: blur(1px)) { .player-guide { background: $station-surface; } }
+@media (max-width: 58rem) {
+  .guide-toggle__label { display: none; }
+  .guide-toggle__icon { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border: 1px solid $station-border; border-radius: 50%; }
+  .case-home__portrait { width: min(100%, 13rem); justify-self: center; }
+  .player-guide__body { padding: $space-5; }
+}

@@ -7,7 +7,6 @@ export function StationBoot({ children }: { children?: ReactNode }) {
   const [phase, setPhase] = useState<"checking" | "playing" | "ready">("checking");
   const [reduced, setReduced] = useState(false);
   const [announcement, setAnnouncement] = useState("");
-  const [run, setRun] = useState(0);
   const bootRef = useRef<HTMLElement>(null);
   const desktopRef = useRef<HTMLDivElement>(null);
   const completedRef = useRef(false);
@@ -27,7 +26,7 @@ export function StationBoot({ children }: { children?: ReactNode }) {
   useEffect(() => {
     let played = false;
     try { played = hasBootPlayed(window.sessionStorage); } catch { /* Continue without persistence. */ }
-    if (played && run === 0 && !startedRef.current) { setPhase("ready"); return; }
+    if (played && !startedRef.current) { setPhase("ready"); return; }
     startedRef.current = true;
     try { markBootPlayed(window.sessionStorage); } catch { /* Continue without storage. */ }
     completedRef.current = false;
@@ -41,7 +40,7 @@ export function StationBoot({ children }: { children?: ReactNode }) {
     const onMotionChange = () => { if (media.matches) { setReduced(true); complete(); } };
     media.addEventListener("change", onMotionChange);
     return () => { window.clearTimeout(timer); media.removeEventListener("change", onMotionChange); };
-  }, [complete, run]);
+  }, [complete]);
 
   useEffect(() => {
     if (phase !== "playing") return;
@@ -79,7 +78,6 @@ export function StationBoot({ children }: { children?: ReactNode }) {
     </section> : null}
     <div ref={desktopRef} className="station-content" data-boot-phase={phase} aria-hidden={phase === "checking"}>
       {children}
-      <button className="boot-replay" type="button" onClick={() => { setRun((value) => value + 1); }}>Rejouer le démarrage</button>
     </div>
   </>;
 }

@@ -1,10 +1,20 @@
 import { expect, test } from "@playwright/test";
 
 test("l’accueil explique le jeu et le bureau Linux occupe l’écran", async ({ page }) => {
+  await page.clock.install();
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Les réponses sont dans les traces." })).toBeVisible();
-  await page.screenshot({ path: "test-results/accueil-linux.png", fullPage: true });
-  await page.getByRole("link", { name: "Ouvrir le bureau" }).click();
+  await page.waitForURL("**/case/001");
+  await expect(page.getByRole("dialog", { name: "Démarrage de la station forensic" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("heading", { name: "Judy Alvarez" })).toBeVisible();
+  await page.getByRole("button", { name: "Comment jouer", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Comment jouer", exact: true })).toBeVisible();
+  await page.screenshot({ path: "test-results/guide.png", fullPage: true });
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("button", { name: "Comment jouer", exact: true })).toBeFocused();
+  await expect(page.getByRole("button", { name: "Rejouer le démarrage" })).toHaveCount(0);
+  await expect(page.getByRole("img", { name: "Portrait de Judy Alvarez" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "Portrait de Judy Alvarez" })).toHaveJSProperty("complete", true);
   const wallpaper = page.locator(".judy-os__wallpaper");
   const bounds = await wallpaper.boundingBox();
   expect(bounds?.width).toBe(page.viewportSize()?.width);
@@ -18,14 +28,15 @@ test("l’accueil explique le jeu et le bureau Linux occupe l’écran", async (
   await page.getByRole("button", { name: "Dossier", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Judy Alvarez" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole("button", { name: "Comment jouer", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Comment jouer", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Fermer les explications" }).click();
   await page.screenshot({ path: "test-results/bureau-mobile.png", fullPage: true });
 });
 
 test("le joueur peut terminer tout le parcours du dossier 001", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "Entrer dans l’ordinateur de Judy." })).toBeVisible();
-  await page.getByRole("link", { name: "Ouvrir le bureau" }).click();
   await page.waitForURL("**/case/001");
 
   await expect(page.locator("img.judy-os__wallpaper")).toHaveAttribute(

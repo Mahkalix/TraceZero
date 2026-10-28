@@ -13,14 +13,7 @@ test("démarrage une fois par session, passage clavier et focus sur le bureau", 
   await page.reload();
   await expect(page.locator('.station-content')).toHaveAttribute("data-boot-phase", "ready");
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page.getByRole("button", { name: "Rejouer le démarrage" }).click();
-  await expect(page.getByRole("dialog")).toBeVisible();
-  await page.keyboard.press("Enter");
-  await expect(page.getByRole("main")).toBeFocused();
-  await page.getByRole("button", { name: "Rejouer le démarrage" }).click();
-  await expect(page.getByRole("dialog")).toBeVisible();
-  await page.keyboard.press("Space");
-  await expect(page.getByRole("main")).toBeFocused();
+  await expect(page.getByRole("button", { name: "Rejouer le démarrage" })).toHaveCount(0);
 });
 
 test("mouvement réduit : titre statique et aucune longue animation", async ({ page }) => {
@@ -74,3 +67,13 @@ test("la composition cinématique reste cadrée sur ordinateur et mobile", async
   await page.keyboard.press("Escape");
   await expect(page.getByRole("main")).toBeFocused();
 });
+
+for (const key of ["Enter", "Space"]) {
+  test(`passer l’intro avec ${key}`, async ({ page }) => {
+    await page.clock.install();
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.keyboard.press(key);
+    await expect(page.getByRole("main")).toBeFocused();
+  });
+}
