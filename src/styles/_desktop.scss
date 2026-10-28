@@ -286,7 +286,7 @@
 
 .notes-tabs {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: $space-1;
   padding: $space-2;
 
@@ -1223,6 +1223,28 @@
   border: 1px solid $material-74;
   border-radius: .75rem;
   pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .8rem; line-height: 1.7; }
+  > p { line-height: 1.65; margin-block: .75rem; }
+  > small { display: block; margin-top: .85rem; line-height: 1.5; }
+}
+
+.story-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .75rem;
+  padding-block: .75rem;
+  .soft-button { white-space: normal; text-align: left; padding: .8rem 1rem; }
+}
+
+.investigation-lead {
+  margin: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid $material-74;
+  border-radius: .75rem;
+  > strong { display: block; margin-top: .5rem; line-height: 1.5; }
+  details { flex: 1 1 12rem; }
+  summary { cursor: pointer; font-size: .8rem; padding: .5rem; }
+  details p { font-size: .85rem; line-height: 1.65; margin: .5rem; }
 }
 
 .investigation-next { border-left: 2px solid $material-25; padding-left: .8rem; }

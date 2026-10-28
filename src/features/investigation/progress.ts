@@ -1,10 +1,14 @@
+import { storyClueIds } from "../../data/chapter-01/story";
+
 export type InvestigationProgress = {
+  storyClueIds?: string[];
   discoveredEvidenceIds: string[];
   validatedHypothesisIds: string[];
   currentStep: "briefing" | "mail" | "analysis" | "conclusion";
 };
 
 export const initialProgress: InvestigationProgress = {
+  storyClueIds: [],
   discoveredEvidenceIds: [],
   validatedHypothesisIds: [],
   currentStep: "briefing",
@@ -15,7 +19,8 @@ export const progressStorageKey = "trace-zero:case-001";
 export function isCaseComplete(progress: InvestigationProgress): boolean {
   return ["E01", "E02", "E03", "E04", "E05", "E06"].every((id) =>
     progress.discoveredEvidenceIds.includes(id),
-  ) && progress.validatedHypothesisIds.includes("H01");
+  ) && progress.validatedHypothesisIds.includes("H01")
+    && storyClueIds.every((id) => progress.storyClueIds?.includes(id));
 }
 
 export function parseProgress(value: unknown): InvestigationProgress {
@@ -24,6 +29,7 @@ export function parseProgress(value: unknown): InvestigationProgress {
     ? [...new Set(value.filter((id): id is string => typeof id === "string" && allowed.includes(id)))]
     : [];
   return {
+    storyClueIds: filterIds(data.storyClueIds, storyClueIds),
     discoveredEvidenceIds: filterIds(data.discoveredEvidenceIds, ["E01", "E02", "E03", "E04", "E05", "E06"]),
     validatedHypothesisIds: filterIds(data.validatedHypothesisIds, ["H01"]),
     currentStep: ["briefing", "mail", "analysis", "conclusion"].includes(String(data.currentStep))

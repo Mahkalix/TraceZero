@@ -1,4 +1,26 @@
 import { expect, test } from "@playwright/test";
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => sessionStorage.setItem("trace-zero:prologue:v1", "read")); });
+
+test("la piste guide Max et conserve les passages en avançant", async ({ page }) => {
+  await page.goto("/case/001");
+  await expect(page.locator('.app-window .investigation-lead')).toHaveCount(0);
+  await page.getByRole("button", { name: "Carnet 0/6" }).click();
+  await page.getByRole("button", { name: "Suivre cette piste" }).click();
+  const messages = page.locator('[data-app="mail"]');
+  await expect(messages.getByRole("heading", { name: "Si on te demande" })).toBeVisible();
+  await messages.getByRole("button", { name: "Lire le message de Nora", exact: true }).click();
+  await page.getByRole("button", { name: "Carnet 0/6" }).click();
+  await expect(page.getByRole("region", { name: "Piste en cours" })).toContainText("1/4 passages");
+  await expect(page.getByRole("region", { name: "Piste en cours" })).toContainText("Que savait Nora");
+  await page.reload();
+  await page.getByRole("button", { name: "Carnet 0/6" }).click();
+  await expect(page.getByRole("region", { name: "Piste en cours" })).toContainText("1/4 passages");
+  await page.getByRole("button", { name: "Suivre cette piste" }).click();
+  await expect(messages.getByRole("heading", { name: "Tu es encore au bureau ?", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Carnet 0/6" }).click();
+  await page.getByText("Besoin d’un indice ?", { exact: true }).click();
+  await expect(page.getByText(/Lis le passage, puis garde-le/)).toBeVisible();
+});
 
 test("l’accueil explique le jeu et le bureau Linux occupe l’écran", async ({ page }) => {
   await page.clock.install();
@@ -24,7 +46,7 @@ test("l’accueil explique le jeu et le bureau Linux occupe l’écran", async (
   await page.screenshot({ path: "test-results/bureau-linux.png", fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole("button", { name: "Messages", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Revue ORION demain" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Si on te demande" })).toBeVisible();
   await page.getByRole("button", { name: "Dossier", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Judy Alvarez" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -46,6 +68,13 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
 
   await expect(page.getByRole("heading", { name: "Judy Alvarez" })).toBeVisible();
   await page.getByRole("button", { name: "Ouvrir Messages" }).click();
+
+  await expect(page.getByRole("heading", { name: "Si on te demande" })).toBeVisible();
+  await expect(page.getByText("BROUILLON / NON ENVOYÉ", { exact: true })).toBeVisible();
+  for (const action of ["Lire le message de Nora", "Retrouver le dernier échange avec Nora", "Lire le dernier message envoyé par Judy", "Chercher comment son compte a pu être compromis"]) {
+    await page.getByRole("button", { name: "Garder ce passage dans mon carnet", exact: true }).click();
+    await page.getByRole("button", { name: action, exact: true }).click();
+  }
 
   await page
     .getByRole("button", {
@@ -84,7 +113,7 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
   await expect(page.getByText("Empreinte divergente", { exact: true }).first()).toBeVisible();
 
   await page.getByRole("button", { name: "Dossier", exact: true }).click();
-  await expect(page.getByText("Piste technique consolidée")).toBeVisible();
+  await expect(page.getByText("Quelqu’un a continué sous son nom.", { exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Fichiers", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Fichiers" })).toBeVisible();
@@ -97,7 +126,7 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
   ).toBeVisible();
 
   await page.reload();
-  await expect(page.getByText("Piste technique consolidée")).toBeVisible();
+  await expect(page.getByText("Quelqu’un a continué sous son nom.", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Recommencer le dossier", exact: true }).click();
   await page.getByRole("button", { name: "Confirmer le redémarrage" }).click();
   await expect(page.getByRole("button", { name: "Carnet 0/6" })).toBeVisible();
@@ -110,10 +139,10 @@ test("une sauvegarde malformée ne casse pas le bureau", async ({ page }) => {
     discoveredEvidenceIds: ["E99", null, "E01", "E01"], currentStep: "bad",
   })));
   await page.goto("/case/001");
-  await expect(page.getByRole("button", { name: "Carnet 1/6" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Carnet 1/6" })).toBeVisible({ timeout: 10000 });
   await page.getByRole("button", { name: "Fichiers", exact: true }).click();
   await page.getByRole("button", { name: /notes.txt/ }).click();
-  await expect(page.getByText("check active sessions tomorrow", { exact: false })).toBeVisible();
+  await expect(page.getByText("Je devrais déjà être au café avec Max.", { exact: false })).toBeVisible();
 });
 
 test("un dossier inconnu affiche une page introuvable", async ({ page }) => {
@@ -123,6 +152,7 @@ test("un dossier inconnu affiche une page introuvable", async ({ page }) => {
 
 test("une fenêtre se déplace fluidement puis peut être rangée", async ({ page }) => {
   await page.goto("/case/001");
+  await expect(page.locator('.station-content')).toHaveAttribute('data-boot-phase', 'ready', { timeout: 10000 });
 
   const handle = page.getByLabel(/Déplacer la fenêtre Dossier/);
   const window = page.locator('[data-app="case"]');

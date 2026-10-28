@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => sessionStorage.setItem("trace-zero:prologue:v1", "read")); });
 
 test("l’analyse explique les erreurs et les preuves partielles", async ({ page }) => {
   await page.goto("/case/001");
@@ -26,6 +27,7 @@ test("l’analyse explique les erreurs et les preuves partielles", async ({ page
 test("un message ordinaire donne un retour visible et aucune preuve", async ({ page }) => {
   await page.goto("/case/001");
   await page.getByRole("button", { name: "Ouvrir Messages" }).click();
+  await page.getByRole("button", { name: /Revue ORION demain/ }).click();
   await page.getByRole("button", { name: "Analyser ce message" }).click();
   await page.getByRole("checkbox", { name: "expéditeur externe" }).check();
   await page.getByRole("checkbox", { name: "destination réelle différente" }).check();
@@ -35,7 +37,12 @@ test("un message ordinaire donne un retour visible et aucune preuve", async ({ p
   await expect(page.locator(".analysis-feedback")).toContainText("aucun lien n’est présent");
   await page.locator(".analysis-sheet").screenshot({ path: "test-results/analysis-explanation.png" });
   await expect(page.getByRole("button", { name: "Carnet 0/6" })).toBeVisible();
-  await page.getByRole("button", { name: /ACTION REQUISE/ }).click();
+  await page.getByRole("checkbox", { name: "expéditeur externe" }).uncheck();
+  await page.getByRole("checkbox", { name: "destination réelle différente" }).uncheck();
+  await page.getByRole("button", { name: "Valider l’analyse" }).click();
+  await expect(page.locator(".analysis-feedback")).toContainText("Vous pouvez poursuivre");
+  await page.getByRole("button", { name: "Examiner l’alerte de sécurité" }).click();
+  await expect(page.getByRole("heading", { name: /ACTION REQUISE/ })).toBeVisible();
   await expect(page.locator(".analysis-feedback")).toHaveCount(0);
   await page.getByRole("button", { name: "Analyser ce message" }).click();
   await page.getByRole("checkbox", { name: "expéditeur externe" }).check();

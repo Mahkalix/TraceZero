@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => sessionStorage.setItem("trace-zero:prologue:v1", "read")); });
 test.use({ video: { mode: "on", size: { width: 1280, height: 720 } } });
 
 test("démarrage une fois par session, passage clavier et focus sur le bureau", async ({ page }) => {

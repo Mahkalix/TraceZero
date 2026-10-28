@@ -17,11 +17,11 @@ export function PlayerGuide() {
       <div className="player-guide__chrome"><span>Guide de l’enquête</span><button type="button" aria-label="Fermer les explications" onClick={() => dialogRef.current?.close()}>×</button></div>
       <div className="player-guide__body">
         <h2 id="player-guide-title">Comment jouer</h2>
-        <p>Judy a disparu. Explorez une copie de son ordinateur pour comprendre ce qui s’est passé.</p>
+        <p>Tu incarnes Max. Judy n’est pas venue à votre rendez-vous et a disparu. Son ordinateur contient un brouillon qui t’est adressé. Pourquoi te demandait-elle de mentir sur son départ ?</p>
         <ol>
           <li><strong>Explorez les applications.</strong><p>Le lanceur ouvre les messages, le réseau, le terminal et les fichiers. Les fenêtres peuvent être déplacées, réduites ou agrandies.</p></li>
-          <li><strong>Collectez les preuves.</strong><p>Analysez les messages suspects et recoupez les traces. Vos découvertes apparaissent dans le carnet.</p></li>
-          <li><strong>Vérifiez votre hypothèse.</strong><p>Validez votre conclusion dans le carnet, puis poursuivez l’enquête jusqu’aux six preuves.</p></li>
+          <li><strong>Reconstituez sa soirée.</strong><p>Gardez les passages importants des messages dans le carnet de Max. Les témoignages peuvent se contredire : une lumière allumée ne prouve pas une présence.</p></li>
+          <li><strong>Vérifiez les traces.</strong><p>Analysez l’alerte suspecte, validez votre hypothèse dans le carnet, puis examinez les connexions et l’archive. Les quatre passages narratifs et les six preuves permettent de conclure le chapitre.</p></li>
         </ol>
         <p className="player-guide__note">Les commandes sont expliquées dans le terminal. La progression est enregistrée sur cet appareil. Aucune action ne touche un système réel.</p>
       </div>

@@ -38,3 +38,23 @@
   .cinema-emblem { width: 27vw; height: 27vw; top: 51%; left: 12%; }
 }
 @media (prefers-reduced-motion: reduce) { .cinema-composition, .cinema-shutter { animation: none !important; } }
+
+.narrative-prologue {
+  pointer-events: auto;
+  background: $cinema-bg;
+  color: $cinema-ink;
+  overflow-y: auto;
+  display: flex;
+  align-items: safe center;
+  justify-content: center;
+  padding: clamp(1.5rem, 6vw, 5rem);
+}
+.prologue-card {
+  width: min(100%, 44rem);
+  h1 { font-family: var(--font-display), sans-serif; font-size: clamp(1.8rem, 4.5vw, 3.5rem); line-height: 1.15; margin: 1.5rem 0 2rem; }
+  .prologue-lines p { font-size: clamp(1rem, 1.7vw, 1.2rem); line-height: 1.8; animation: prologue-reveal .7s ease both; }
+  .story-actions { margin-top: 2rem; }
+}
+.prologue-skip { background: none; border: 0; color: inherit; text-decoration: underline; padding: .8rem; cursor: pointer; font: inherit; font-size: .8rem; }
+@keyframes prologue-reveal { from { opacity: 0; transform: translateY(.5rem); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .prologue-lines p { animation: none !important; } }

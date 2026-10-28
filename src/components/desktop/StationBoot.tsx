@@ -3,8 +3,18 @@
 import React, { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { finishBoot, hasBootPlayed, markBootPlayed } from "../../features/presentation/boot-session";
 
+const prologueKey = "trace-zero:prologue:v1";
+const prologue = [
+  { title: "Tu t’appelles Max.", lines: ["Judy devait te retrouver au café, à votre table habituelle.", "Elle n’est jamais venue. Depuis trente-six heures, plus personne n’a de nouvelles."] },
+  { title: "Son ordinateur est encore allumé.", lines: ["Ses messages, ses notes, les traces de sa dernière soirée : tout est encore là.", "Dans ses brouillons, quelques mots te sont adressés."] },
+  { title: "« Max, si on te demande, je suis partie à 20 h 30. »", lines: ["Ce message n’a jamais été envoyé.", "Pourquoi Judy voulait-elle que tu la couvres ? Et que s’est-il passé après ?"] },
+  { title: "Reconstitue sa dernière soirée.", lines: ["Commence par ce brouillon, puis recoupe les échanges avec Nora. Garde les passages importants dans ton carnet.", "Les fichiers et les connexions t’aideront à vérifier leurs versions. Si tu ne sais plus où chercher, ouvre Carnet → Pistes.", "Tu cherches ce qui est arrivé à Judy. Chaque message n’est pas une énigme à valider."] },
+];
+
 export function StationBoot({ children }: { children?: ReactNode }) {
-  const [phase, setPhase] = useState<"checking" | "playing" | "ready">("checking");
+  const [phase, setPhase] = useState<"checking" | "playing" | "story" | "ready">("checking");
+  const [storyPage, setStoryPage] = useState(0);
+  const storyRef = useRef<HTMLElement>(null);
   const [reduced, setReduced] = useState(false);
   const [announcement, setAnnouncement] = useState("");
   const bootRef = useRef<HTMLElement>(null);
@@ -16,6 +26,7 @@ export function StationBoot({ children }: { children?: ReactNode }) {
     if (completedRef.current) return;
     completedRef.current = true;
     try { finishBoot(window.sessionStorage, skipped); } catch { /* Storage can be blocked. */ }
+    try { window.sessionStorage.setItem(prologueKey, "read"); } catch { /* Optional persistence. */ }
     setPhase("ready");
     setAnnouncement("Dossier prêt");
     window.requestAnimationFrame(() => {
@@ -23,10 +34,20 @@ export function StationBoot({ children }: { children?: ReactNode }) {
     });
   }, []);
 
+  const beginStory = useCallback(() => {
+    let read = false;
+    try { read = window.sessionStorage.getItem(prologueKey) === "read"; } catch { /* Show context. */ }
+    if (read) complete(); else setPhase("story");
+  }, [complete]);
+
   useEffect(() => {
     let played = false;
     try { played = hasBootPlayed(window.sessionStorage); } catch { /* Continue without persistence. */ }
-    if (played && !startedRef.current) { setPhase("ready"); return; }
+    if (played && !startedRef.current) {
+      let read = false;
+      try { read = window.sessionStorage.getItem(prologueKey) === "read"; } catch { /* Show context if unavailable. */ }
+      setPhase(read ? "ready" : "story"); return;
+    }
     startedRef.current = true;
     try { markBootPlayed(window.sessionStorage); } catch { /* Continue without storage. */ }
     completedRef.current = false;
@@ -36,29 +57,39 @@ export function StationBoot({ children }: { children?: ReactNode }) {
     setAnnouncement("Chargement du dossier 001");
     const styles = window.getComputedStyle(desktopRef.current!);
     const duration = Number.parseFloat(styles.getPropertyValue(media.matches ? "--boot-reduced-ms" : "--boot-duration-ms"));
-    const timer = window.setTimeout(() => complete(), duration);
-    const onMotionChange = () => { if (media.matches) { setReduced(true); complete(); } };
+    const timer = window.setTimeout(beginStory, duration);
+    const onMotionChange = () => { if (media.matches) { setReduced(true); beginStory(); } };
     media.addEventListener("change", onMotionChange);
     return () => { window.clearTimeout(timer); media.removeEventListener("change", onMotionChange); };
-  }, [complete]);
+  }, [beginStory]);
+
+  useEffect(() => {
+    const replay = () => { completedRef.current = false; setStoryPage(0); setPhase("story"); };
+    window.addEventListener("trace:prologue", replay);
+    return () => window.removeEventListener("trace:prologue", replay);
+  }, []);
+
+  useEffect(() => { if (phase === "story") storyRef.current?.focus(); }, [phase, storyPage]);
+  useEffect(() => { if (phase === "ready") desktopRef.current?.querySelector<HTMLElement>("#main-content")?.focus(); }, [phase]);
 
   useEffect(() => {
     if (phase !== "playing") return;
     bootRef.current?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (["Enter", "Escape", " "].includes(event.key)) {
-        event.preventDefault(); complete(true);
+        event.preventDefault();
+        if (event.key === "Escape") complete(true); else beginStory();
       }
       if (event.key === "Tab") { event.preventDefault(); bootRef.current?.focus(); }
     };
     window.addEventListener("keydown", onKey);
-    const onPointer = () => complete(true);
+    const onPointer = () => beginStory();
     window.addEventListener("pointerdown", onPointer, { capture: true, once: true });
     return () => {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("pointerdown", onPointer, true);
     };
-  }, [complete, phase]);
+  }, [beginStory, complete, phase]);
 
   return <>
     <p className="sr-only" role="status" aria-live="polite">{announcement}</p>
@@ -76,7 +107,27 @@ export function StationBoot({ children }: { children?: ReactNode }) {
       </div>
       {reduced ? <p className="boot-static">Trace//Zero · Dossier 001 prêt</p> : null}
     </section> : null}
-    <div ref={desktopRef} className="station-content" data-boot-phase={phase} aria-hidden={phase === "checking"}>
+    {phase === "story" ? <section ref={storyRef} tabIndex={-1} className="station-boot narrative-prologue" role="dialog" aria-modal="true" aria-label="La dernière soirée — prologue" onKeyDown={(event) => {
+      if (event.key === "Escape") { event.preventDefault(); complete(true); }
+      if (event.key === "Tab") {
+        const buttons = Array.from(storyRef.current?.querySelectorAll<HTMLButtonElement>("button") ?? []);
+        const first = buttons[0]; const last = buttons[buttons.length - 1];
+        if (event.shiftKey && (document.activeElement === first || document.activeElement === storyRef.current)) { event.preventDefault(); last?.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+      }
+    }}>
+      <div className="prologue-card" key={storyPage}>
+        <span className="micro-label">TRACE // ZERO · LA DERNIÈRE SOIRÉE · {storyPage + 1} / {prologue.length}</span>
+        <h1>{prologue[storyPage].title}</h1>
+        <div className="prologue-lines">{prologue[storyPage].lines.map((line, index) => <p key={line} style={{ animationDelay: `${.2 + index * .45}s` }}>{line}</p>)}</div>
+        <div className="story-actions">
+          {storyPage > 0 ? <button className="soft-button" type="button" onClick={() => setStoryPage((page) => page - 1)}>Précédent</button> : null}
+          <button className="soft-button" type="button" onClick={() => storyPage < prologue.length - 1 ? setStoryPage((page) => page + 1) : complete()}>{storyPage < prologue.length - 1 ? "Continuer" : "Entrer dans le bureau"}</button>
+          <button className="prologue-skip" type="button" onClick={() => complete(true)}>Passer le prologue</button>
+        </div>
+      </div>
+    </section> : null}
+    <div ref={desktopRef} className="station-content" data-boot-phase={phase} aria-hidden={phase !== "ready"} inert={phase !== "ready"}>
       {children}
     </div>
   </>;

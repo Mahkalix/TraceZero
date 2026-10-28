@@ -2,6 +2,14 @@
 
 Jeu narratif d'enquête cyber centré sur la disparition de Judy Alvarez.
 
+## La dernière soirée
+
+Après le titre animé, un prologue en quatre écrans présente Max, le rendez-vous manqué, le brouillon et l’objectif de l’enquête. Les phrases apparaissent progressivement ; le joueur avance à son rythme, revient en arrière ou passe le prologue. En mouvement réduit, le texte est immédiat. Le bureau reste inactif pendant la lecture. La clé de session `trace-zero:prologue:v1` est distincte du titre et de la progression ; les sessions existantes voient donc le nouveau contexte. « Relire le prologue » dans le dossier permet de le rouvrir. Les pistes et les indices restent dans l’onglet Pistes du carnet.
+
+Le joueur incarne Max, sans genre imposé. Judy a manqué leur rendez-vous au café ; 36 heures plus tard, son ordinateur révèle un brouillon non envoyé : « Max, si on te demande, je suis partie à 20 h 30. » Nora évoque une lumière allumée à 20 h 31, puis un départ à 22 h 12. À 22 h 47, un message envoyé au nom de Judy accuse Nora et affirme que Judy est toujours au bureau.
+
+Quatre passages peuvent être conservés dans le carnet de Max et relus. Les connexions et l’empreinte de l’archive permettent de questionner les messages plutôt que de suivre seulement une procédure technique. La chronologie distingue témoignages, événements enregistrés et vérifications de Max. La fin exige ces quatre passages, les six preuves et H01. Les anciennes sauvegardes conservent leurs preuves ; les passages narratifs restent à découvrir. La DA, le bureau et l’intro sont conservés.
+
 ## Dossier 001
 
 Le prototype permet déjà de :
@@ -20,7 +28,7 @@ Le prototype permet déjà de :
 12. reconstruire la chronologie et terminer avec les six preuves et H01
 13. reprendre sa partie ou recommencer avec confirmation
 
-Le dossier technique possède une fin jouable. La localisation de Judy et l’identité de l’auteur ne sont pas établies par les preuves : aucun chapitre supplémentaire n’est inclus.
+Le chapitre possède une fin jouable : une autre machine a repris le compte de Judy avant le message qui accuse Nora. Son départ reste fondé sur le témoignage de Nora ; sa localisation et l’identité de l’auteur ne sont pas établies. Aucun chapitre supplémentaire n’est inclus.
 
 ## Stack
 
