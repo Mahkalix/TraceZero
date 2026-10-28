@@ -58,6 +58,7 @@ test("l’accueil explique le jeu et le bureau Linux occupe l’écran", async (
 
 test("le joueur peut terminer tout le parcours du dossier 001", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator('.station-content')).toHaveAttribute('data-boot-phase', 'ready', { timeout: 10000 });
 
   await page.waitForURL("**/case/001");
 

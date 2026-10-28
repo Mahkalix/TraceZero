@@ -17,9 +17,10 @@ for (const width of [1280, 390]) {
   });
 }
 
-test('le son se lance sans passer le titre et peut être coupé', async ({ page }) => {
+test('le son reste actif dans le bureau et le volume est mémorisé', async ({ page }) => {
   await page.clock.install();
   await page.goto('/case/001');
+  await page.getByRole('button', { name: 'Couper le son' }).click();
   await page.getByRole('button', { name: 'Activer le son' }).click();
   await expect(page.getByRole('button', { name: 'Couper le son' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('.station-content')).toHaveAttribute('data-boot-phase', 'playing');
@@ -27,6 +28,33 @@ test('le son se lance sans passer le titre et peut être coupé', async ({ page 
   await expect(page.getByRole('button', { name: 'Couper le son' })).toBeVisible();
   await page.getByRole('button', { name: 'Couper le son' }).click();
   await expect(page.getByRole('button', { name: 'Activer le son' })).toHaveAttribute('aria-pressed', 'false');
+  await page.getByRole('button', { name: 'Activer le son' }).click();
+  await page.getByRole('button', { name: 'Passer le prologue' }).click();
+  await page.getByRole('button', { name: 'Volume de la musique' }).click();
+  await expect(page.getByRole('button', { name: 'Couper le son' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('slider', { name: 'Volume', exact: true }).fill('25');
+  await expect(page.getByRole('slider')).toHaveValue('25');
+  await page.screenshot({ path: 'test-results/desktop-volume.png' });
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: 'Volume de la musique' })).toBeFocused();
+  await page.reload();
+  await page.getByRole('button', { name: 'Volume de la musique' }).click();
+  await expect(page.getByRole('slider')).toHaveValue('25');
+  await page.getByRole('button', { name: 'Couper le son' }).click();
+  await page.reload();
+  await page.getByRole('button', { name: 'Volume de la musique' }).click();
+  await expect(page.getByRole('button', { name: 'Activer le son' })).toBeVisible();
+});
+
+test('le crédit et le titre disparaissent ensemble', async ({ page }) => {
+  await page.clock.install();
+  await page.goto('/case/001');
+  await expect(page.locator('.cinema-credit')).toBeVisible();
+  const timing = await page.evaluate(() => ['.cinema-composition', '.cinema-credit'].map((selector) => {
+    const style = getComputedStyle(document.querySelector(selector)!);
+    return [style.animationName, style.animationDuration, style.animationDelay];
+  }));
+  expect(timing[0]).toEqual(timing[1]);
 });
 
 test("le bureau reste masqué entre le titre et le prologue", async ({ page }) => {

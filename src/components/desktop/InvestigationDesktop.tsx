@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { PlayerGuide } from "./PlayerGuide";
 import { SystemStatus } from "./SystemStatus";
+import { AudioControl } from "./SiteAudio";
 
 import {
   FormEvent,
@@ -1019,6 +1020,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
             Carnet {progress.discoveredEvidenceIds.length}/6
           </button>
           <SystemStatus />
+          <AudioControl />
         </div>
       </header>
 

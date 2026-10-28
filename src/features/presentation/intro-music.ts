@@ -1,13 +1,11 @@
 // Original procedural score for Trace//Zero. No recordings or third-party samples.
-export async function startIntroMusic() {
+export function createSiteMusic() {
   const context = new AudioContext();
-  try { await context.resume(); } catch (error) { void context.close(); throw error; }
   const master = context.createGain();
   const filter = context.createBiquadFilter();
   filter.type = "lowpass";
   filter.frequency.value = 2400;
   master.gain.setValueAtTime(0, context.currentTime);
-  master.gain.linearRampToValueAtTime(.16, context.currentTime + .6);
   filter.connect(master).connect(context.destination);
   let step = 0;
   let next = context.currentTime + .05;
@@ -47,10 +45,17 @@ export async function startIntroMusic() {
   };
   schedule();
   const timer = window.setInterval(schedule, 50);
-  return () => {
+  return {
+    resume: () => context.resume(),
+    setVolume: (volume: number) => {
+      master.gain.cancelScheduledValues(context.currentTime);
+      master.gain.setTargetAtTime(Math.max(0, Math.min(1, volume)) * .4, context.currentTime, .06);
+    },
+    stop: () => {
     window.clearInterval(timer);
     master.gain.cancelScheduledValues(context.currentTime);
     master.gain.setTargetAtTime(0, context.currentTime, .04);
     window.setTimeout(() => { void context.close(); }, 180);
+    },
   };
 }
