@@ -99,7 +99,7 @@
 .volume-trigger { display: inline-flex; align-items: center; justify-content: center; min-width: 2rem; min-height: 2rem; color: inherit; background: none; border: 0; border-radius: .4rem; cursor: pointer; }
 .volume-trigger:hover, .volume-trigger[aria-expanded="true"] { background: rgba(255,255,255,.1); }
 .volume-panel { position: absolute; right: 0; top: calc(100% + .8rem); width: min(21rem, calc(100vw - 2rem)); padding: 1.25rem; border: 1px solid rgba(255,255,255,.16); border-radius: .85rem; background: #252525; color: #eee; box-shadow: 0 12px 40px #0008; z-index: 100; }
-.volume-row { display: flex; align-items: center; gap: .8rem; margin-top: 1rem; }
+.volume-row { display: flex; align-items: center; gap: .8rem; }
 .volume-row input { min-width: 0; flex: 1; accent-color: $cinema-ink; cursor: pointer; }
 .volume-row output { min-width: 3ch; font: .75rem var(--font-mono), monospace; }
 .prologue-skip { background: none; border: 0; color: inherit; text-decoration: underline; padding: .8rem; cursor: pointer; font: inherit; font-size: .8rem; }

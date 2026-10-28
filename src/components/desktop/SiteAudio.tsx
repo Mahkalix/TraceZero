@@ -74,7 +74,6 @@ export function AudioControl({ intro = false }: { intro?: boolean }) {
   return <div className="desktop-audio" data-audio-control ref={root} onKeyDown={(event) => { if (event.key === "Escape" && open) { event.stopPropagation(); setOpen(false); trigger.current?.focus(); } }}>
     <button ref={trigger} className="volume-trigger" type="button" aria-label="Volume de la musique" title={off ? "Son coupé" : `Volume : ${volume} %`} aria-expanded={open} aria-controls="music-volume-panel" onClick={() => setOpen((value) => !value)}><Speaker muted={off}/></button>
     {open ? <section id="music-volume-panel" className="volume-panel" aria-label="Réglages du son">
-      <span className="micro-label">Musique · Trace // Zero</span>
       <div className="volume-row">
         <button type="button" className="volume-trigger" aria-label={off ? "Activer le son" : "Couper le son"} aria-pressed={!off} onClick={toggle}><Speaker muted={off}/></button>
         <input type="range" min="0" max="100" step="1" aria-label="Volume" aria-valuetext={`${volume} %${muted ? ', son coupé' : ''}`} value={volume} onChange={(event) => changeVolume(Number(event.target.value))} style={{ '--volume': `${volume}%` } as CSSProperties}/>
