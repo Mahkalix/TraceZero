@@ -7,9 +7,6 @@
 .cinema-shutter--top { top: 0; animation: cinema-open-top $cinema-exit-time $cinema-ease $cinema-exit-cue both; }
 .cinema-shutter--bottom { bottom: 0; animation: cinema-open-bottom $cinema-exit-time $cinema-ease $cinema-exit-cue both; }
 .cinema-composition { position: absolute; inset: 0; overflow: hidden; color: $cinema-ink; animation: cinema-leave $cinema-exit-time $cinema-ease $cinema-exit-cue both; }
-.cinema-topline { position: absolute; top: $space-6; left: $space-6; right: 15rem; display: flex; justify-content: space-between; align-items: center; gap: $space-5; font: .65rem var(--font-mono), monospace; letter-spacing: .12em; }
-.cinema-topline > span:first-child { font-size: .9rem; font-weight: 700; }
-.cinema-topline > span:last-child { color: $cinema-muted; }
 .boot-skip { border: 0; background: transparent; color: $cinema-muted; top: $space-5; right: $space-5; font: .7rem var(--font-mono), monospace; letter-spacing: .08em; }
 .boot-skip:hover { color: $cinema-ink; }
 .cinema-title { position: absolute; left: 5%; right: 5%; top: 50%; transform: translateY(-54%); }
@@ -26,44 +23,17 @@
 .cinema-emblem > span { position: absolute; width: 20%; height: 100%; background: $cinema-ink; transform: skewX(-22deg); animation: cinema-slash $cinema-type-time $cinema-ease $cinema-second-cue both; }
 .cinema-emblem > span:first-child { left: 20%; }
 .cinema-emblem > span:last-child { left: 57%; animation-delay: $cinema-second-cue + $cinema-letter-step * 2; }
-.cinema-cross { position: absolute; color: $cinema-muted; font: 1rem var(--font-mono), monospace; }
-.cinema-cross--one { top: 20%; right: 6%; }
-.cinema-cross--two { bottom: 22%; left: 4%; }
-.cinema-bottom { position: absolute; left: $space-6; right: $space-6; bottom: 3.5rem; display: flex; justify-content: space-between; align-items: flex-end; gap: $space-6; }
-.cinema-counter { display: flex; align-items: flex-end; gap: $space-4; }
-.cinema-counter__window { display: block; height: 3.6rem; overflow: hidden; }
-.cinema-counter__reel { display: block; animation: cinema-count $cinema-counter-time steps(1,end) $cinema-first-cue both; }
-.cinema-counter__reel b { display: block; height: 3.6rem; font: 500 3.8rem/3.6rem var(--font-mono), monospace; letter-spacing: -.1em; padding-right: .15em; }
-.cinema-counter__unit { font: .55rem/1.8 var(--font-mono), monospace; letter-spacing: .08em; color: $cinema-muted; }
-.cinema-story { display: grid; gap: $space-1; text-align: right; font: .65rem/1.5 var(--font-mono), monospace; letter-spacing: .1em; }
-.cinema-story > * { animation: cinema-copy $cinema-type-time $cinema-ease $cinema-story-cue both; }
-.cinema-story > span { color: $cinema-muted; }
-.cinema-story > :nth-child(2) { animation-delay: $cinema-story-cue + $cinema-letter-step * 2; }
-.cinema-story > :nth-child(3) { animation-delay: $cinema-story-cue + $cinema-letter-step * 4; }
-.cinema-progress { position: absolute; left: $space-6; right: $space-6; bottom: $space-6; height: 1px; background: $cinema-stroke; }
-.cinema-progress > span { position: absolute; inset: 0; background: $cinema-ink; transform-origin: left; animation: cinema-load $cinema-counter-time $cinema-ease $cinema-first-cue both; }
-.cinema-coordinate { position: absolute; bottom: $space-2; left: $space-6; font: .5rem var(--font-mono), monospace; letter-spacing: .12em; color: $cinema-muted; }
 .station-boot[data-reduced="true"] { background: $cinema-bg; }
 @keyframes cinema-type { from { transform: translateY(110%) rotate(5deg); opacity: 0; } to { transform: translateY(0) rotate(0); opacity: 1; } }
 @keyframes cinema-outline { from { transform: translateY(-110%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes cinema-slash { from { transform: translateY(50%) skewX(-22deg) scaleY(0); opacity: 0; } to { transform: translateY(0) skewX(-22deg) scaleY(1); opacity: 1; } }
-@keyframes cinema-copy { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes cinema-count { 0% { transform: translateY(0); } 18% { transform: translateY(-3.6rem); } 38% { transform: translateY(-7.2rem); } 60% { transform: translateY(-10.8rem); } 82% { transform: translateY(-14.4rem); } 100% { transform: translateY(-18rem); } }
-@keyframes cinema-load { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes cinema-open-top { to { transform: translateY(-105%); } }
 @keyframes cinema-open-bottom { to { transform: translateY(105%); } }
 @keyframes cinema-leave { 0% { transform: scale(1); opacity: 1; } 60%, 100% { transform: scale(1.07); opacity: 0; } }
 @media (max-width: 58rem) {
-  .cinema-topline { top: $space-6; left: $space-5; right: 8rem; }
-  .cinema-topline > span:last-child { display: none; }
   .cinema-word { font-size: $cinema-type-mobile; }
   .cinema-title { left: 4%; right: 6%; }
   .cinema-word--zero { margin-top: .2em; }
   .cinema-emblem { width: 27vw; height: 27vw; top: 51%; left: 12%; }
-  .cinema-bottom { left: $space-5; right: $space-5; bottom: 4rem; }
-  .cinema-story { font-size: .5rem; }
-  .cinema-counter__unit { display: none; }
-  .cinema-cross--one { top: 28%; }
-  .cinema-cross--two { bottom: 28%; }
 }
 @media (prefers-reduced-motion: reduce) { .cinema-composition, .cinema-shutter { animation: none !important; } }
