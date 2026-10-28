@@ -2,6 +2,7 @@
 
 // The title is a graphic composition. Every moving layer uses transform/opacity.
 .station-boot { background: transparent; }
+.station-boot:focus { outline: none; box-shadow: none; }
 .boot-scene { display: block; }
 .cinema-shutter { position: absolute; left: 0; right: 0; height: 51%; background: $cinema-bg; }
 .cinema-shutter--top { top: 0; animation: cinema-open-top $cinema-exit-time $cinema-ease $cinema-exit-cue both; }
@@ -10,7 +11,7 @@
 .boot-skip { border: 0; background: transparent; color: $cinema-muted; top: $space-5; right: $space-5; font: .7rem var(--font-mono), monospace; letter-spacing: .08em; }
 .boot-skip:hover { color: $cinema-ink; }
 .cinema-title { position: absolute; left: 5%; right: 5%; top: 50%; transform: translateY(-54%); }
-.cinema-word { display: flex; font-family: var(--font-ui), sans-serif; font-size: $cinema-type-size; font-weight: 800; letter-spacing: -.095em; line-height: .77; }
+.cinema-word { display: flex; font-family: var(--font-display), var(--font-ui), sans-serif; font-size: $cinema-type-size; font-weight: 700; letter-spacing: -.055em; line-height: .85; }
 .cinema-word > span { overflow: hidden; padding-bottom: .09em; padding-right: .14em; margin-right: -.14em; }
 .cinema-word b { display: block; font-weight: inherit; animation: cinema-type $cinema-type-time $cinema-ease $cinema-first-cue both; }
 .cinema-word--zero { justify-content: flex-end; margin-top: -.015em; padding-right: .08em; color: transparent; -webkit-text-stroke: 1px $cinema-ink; }

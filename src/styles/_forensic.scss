@@ -1,10 +1,11 @@
 @use "tokens" as *;
 
 body { color: $station-text; background: $station-bg; }
-.entry-os, .judy-os { color: $station-text; background: $station-bg; }
-.entry-os__wallpaper, .judy-os__wallpaper { filter: grayscale(1) brightness(.45); }
+.entry-os, .judy-os { color: $station-text; background: $station-bg url('/judy-apartment.jpg') center / cover fixed; }
+.entry-os__wallpaper, .judy-os__wallpaper { position: absolute; width: 100%; height: 100%; min-height: 100svh; filter: saturate(.9) brightness(.8); }
 .entry-os__veil, .judy-os__veil {
-  background: repeating-linear-gradient(90deg, transparent 0 79px, $station-reflection 80px), repeating-linear-gradient(0deg, transparent 0 79px, $station-reflection 80px);
+  position: absolute;
+  background: linear-gradient(90deg, $wallpaper-reading-shade, $wallpaper-shade);
 }
 .entry-menubar, .os-menubar, .os-dock, .app-window, .notes-inspector, .entry-guide {
   background: $station-glass; border-color: $station-border;

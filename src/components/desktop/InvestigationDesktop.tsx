@@ -57,7 +57,7 @@ type TerminalLine = {
   output?: string;
 };
 
-const judyWallpaper = "/trace-wallpaper.svg";
+const judyWallpaper = "/judy-apartment.jpg";
 
 const apps: Array<{
   id: ActiveApp;

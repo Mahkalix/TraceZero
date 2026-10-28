@@ -76,9 +76,9 @@ Les versions de PostCSS et Sharp sont corrigées via `overrides` pour conserver 
 
 ## Direction artistique forensic
 
-DÉCISION : accent unique `#D3E97A`, matériaux sombres neutres, Manrope pour les textes et Source Code Pro pour les métadonnées. Les valeurs de couleur, flou et durée sont centralisées dans `_tokens.scss`. La couche `_forensic.scss` distingue les surfaces de lecture à 96 % d’opacité du chrome en verre à 76 %, avec un fallback opaque sans backdrop-filter.
+DÉCISION : accent unique `#D3E97A`, matériaux sombres neutres, Manrope pour les textes, Source Code Pro pour les métadonnées et Chakra Petch pour le titre animé. Le fond cyberpunk original est restauré, avec des voiles sombres et le jaune conservé. Les valeurs de couleur, flou et durée sont centralisées dans `_tokens.scss`. La couche `_forensic.scss` distingue les surfaces de lecture à 96 % d’opacité du chrome en verre à 76 %, avec un fallback opaque sans backdrop-filter.
 
-Le composant `StationBoot` présente une séquence CSS de cinq secondes à la première ouverture du bureau par session. Sa direction s’inspire du rythme typographique de [1minus1](https://1minus1.com/) : titre monumental plein/contour, lettres révélées en décalé, monogramme à deux barres, puis ouverture en deux volets sur le bureau. Les textes et les éléments graphiques sont propres à Trace//Zero. Le bouton Passer et les touches Entrée, Échap et Espace l’interrompent. Un geste pointeur l’interrompt également pour laisser le bureau réagir immédiatement. Un bouton discret permet de la rejouer. La session utilise une clé sessionStorage séparée ; la progression de jeu et son localStorage ne changent pas.
+Le composant `StationBoot` présente une séquence CSS de cinq secondes à la première ouverture du bureau par session. Sa direction s’inspire du rythme typographique de [1minus1](https://1minus1.com/) : titre monumental plein/contour, lettres révélées en décalé, monogramme à deux barres, puis ouverture en deux volets sur le bureau. Les textes et les éléments graphiques sont propres à Trace//Zero. Aucun bouton Passer n’est affiché. Les touches Entrée, Échap et Espace permettent toujours d’interrompre la séquence. Un geste pointeur l’interrompt également pour laisser le bureau réagir immédiatement. Un bouton discret permet de la rejouer. La session utilise une clé sessionStorage séparée ; la progression de jeu et son localStorage ne changent pas.
 
 En mouvement réduit, la présentation devient un titre statique de 300 ms, sans glitch ni balayage. Le focus revient au bureau après la séquence. Les preuves et conclusions déclenchent un effet local ponctuel, masqué aux technologies d’assistance et désactivé en mouvement réduit. Aucune animation de backdrop-filter.
 
@@ -91,3 +91,5 @@ Non vérifiés : lecteur d’écran réel, zoom 200 %, contrastes sur chaque fon
 ## Direction produit
 
 Le dossier 001 fonctionne sans backend. Les futurs chapitres et la synchronisation multi-appareils restent des extensions du produit.
+
+Fond de l’appartement : image de présentation de [Cyberpunk 2077 — Judy’s Apartment, par RC13](https://steamcommunity.com/sharedfiles/filedetails/?id=2321339181). Cette copie remplace le JPEG tronqué du dépôt ; les visuels du jeu restent la propriété de leurs ayants droit.

@@ -8,7 +8,7 @@ export function StationBoot({ children }: { children?: ReactNode }) {
   const [reduced, setReduced] = useState(false);
   const [announcement, setAnnouncement] = useState("");
   const [run, setRun] = useState(0);
-  const skipRef = useRef<HTMLButtonElement>(null);
+  const bootRef = useRef<HTMLElement>(null);
   const desktopRef = useRef<HTMLDivElement>(null);
   const completedRef = useRef(false);
   const startedRef = useRef(false);
@@ -45,12 +45,12 @@ export function StationBoot({ children }: { children?: ReactNode }) {
 
   useEffect(() => {
     if (phase !== "playing") return;
-    skipRef.current?.focus();
+    bootRef.current?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (["Enter", "Escape", " "].includes(event.key)) {
         event.preventDefault(); complete(true);
       }
-      if (event.key === "Tab") { event.preventDefault(); skipRef.current?.focus(); }
+      if (event.key === "Tab") { event.preventDefault(); bootRef.current?.focus(); }
     };
     window.addEventListener("keydown", onKey);
     const onPointer = () => complete(true);
@@ -63,8 +63,7 @@ export function StationBoot({ children }: { children?: ReactNode }) {
 
   return <>
     <p className="sr-only" role="status" aria-live="polite">{announcement}</p>
-    {phase === "playing" ? <section className="station-boot" data-reduced={reduced} role="dialog" aria-modal="true" aria-label="Démarrage de la station forensic">
-      <button ref={skipRef} className="boot-skip" onClick={() => complete(true)} type="button">Passer</button>
+    {phase === "playing" ? <section ref={bootRef} tabIndex={-1} className="station-boot" data-reduced={reduced} role="dialog" aria-modal="true" aria-label="Démarrage de la station forensic">
       <div className="boot-scene" aria-hidden="true">
         <div className="cinema-shutter cinema-shutter--top" />
         <div className="cinema-shutter cinema-shutter--bottom" />

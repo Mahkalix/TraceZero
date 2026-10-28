@@ -2,9 +2,11 @@ import { expect, test } from "@playwright/test";
 test.use({ video: { mode: "on", size: { width: 1280, height: 720 } } });
 
 test("démarrage une fois par session, passage clavier et focus sur le bureau", async ({ page }) => {
-  await page.goto("/case/001");
+  await page.clock.install();
+  await page.goto("/case/001", { waitUntil: "domcontentloaded" });
   await expect(page.getByRole("dialog", { name: "Démarrage de la station forensic" })).toBeVisible();
-  await expect(page.getByRole("button", { name: /Passer/ })).toBeFocused();
+  await expect(page.getByRole("dialog")).toBeFocused();
+  await expect(page.getByRole("button", { name: /Passer/ })).toHaveCount(0);
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByRole("main")).toBeFocused();
@@ -24,7 +26,7 @@ test("démarrage une fois par session, passage clavier et focus sur le bureau", 
 test("mouvement réduit : titre statique et aucune longue animation", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.clock.install();
-  await page.goto("/case/001");
+  await page.goto("/case/001", { waitUntil: "domcontentloaded" });
   await expect(page.getByText("Trace//Zero · Dossier 001 prêt", { exact: true })).toBeVisible();
   await page.clock.runFor(350);
   await expect(page.getByRole("main")).toBeFocused();
@@ -36,7 +38,7 @@ test("mouvement réduit : titre statique et aucune longue animation", async ({ p
 });
 
 test("la séquence naturelle termine après cinq secondes et mémorise la session", async ({ page }) => {
-  await page.goto("/case/001");
+  await page.goto("/case/001", { waitUntil: "domcontentloaded" });
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.screenshot({ path: "test-results/forensic-boot.png" });
   await expect(page.getByRole("main")).toBeFocused({ timeout: 7000 });
@@ -44,7 +46,7 @@ test("la séquence naturelle termine après cinq secondes et mémorise la sessio
 });
 
 test("recharger pendant le boot ne relance pas la séquence", async ({ page }) => {
-  await page.goto("/case/001");
+  await page.goto("/case/001", { waitUntil: "domcontentloaded" });
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.reload();
   await expect(page.locator(".station-content")).toHaveAttribute("data-boot-phase", "ready");
@@ -53,7 +55,7 @@ test("recharger pendant le boot ne relance pas la séquence", async ({ page }) =
 
 test("la composition cinématique reste cadrée sur ordinateur et mobile", async ({ page }) => {
   await page.clock.install();
-  await page.goto("/case/001");
+  await page.goto("/case/001", { waitUntil: "domcontentloaded" });
   await expect(page.getByRole("dialog")).toBeVisible();
   const frame = async () => page.evaluate(() => {
     document.getAnimations().forEach((animation) => {

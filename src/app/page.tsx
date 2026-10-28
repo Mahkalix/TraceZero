@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const judyWallpaper = "/trace-wallpaper.svg";
+const judyWallpaper = "/judy-apartment.jpg";
 
 export default function HomePage() {
   return (
