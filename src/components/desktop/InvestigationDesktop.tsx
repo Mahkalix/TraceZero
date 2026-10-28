@@ -880,8 +880,9 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   }
 
   return (
-    <main className="judy-os" id="main-content">
+    <main className="judy-os" id="main-content" tabIndex={-1} aria-label="Bureau forensic, dossier 001">
       <p className="sr-only" aria-live="polite">{announcement}</p>
+      {announcement && /preuves|Phishing ciblé confirmé|Empreinte divergente/.test(announcement) ? <div key={announcement} className="evidence-notice" aria-hidden="true">{announcement}</div> : null}
       {saveFailed ? <p className="save-warning" role="status">Sauvegarde locale indisponible. Gardez cet onglet ouvert pour conserver votre progression.</p> : null}
 
       <img className="judy-os__wallpaper" src={judyWallpaper} alt="" aria-hidden="true" />
