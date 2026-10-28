@@ -73,7 +73,6 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
   await expect(page.getByRole("heading", { name: "Si on te demande" })).toBeVisible();
   await expect(page.getByText("BROUILLON / NON ENVOYÉ", { exact: true })).toBeVisible();
   for (const action of ["Lire le message de Nora", "Retrouver le dernier échange avec Nora", "Lire le dernier message envoyé par Judy", "Chercher comment son compte a pu être compromis"]) {
-    await page.getByRole("button", { name: "Garder ce passage dans mon carnet", exact: true }).click();
     await page.getByRole("button", { name: action, exact: true }).click();
   }
 

@@ -130,7 +130,6 @@ export function StationBoot({ children }: { children?: ReactNode }) {
         <div className="story-actions">
           <button className="soft-button" type="button" disabled={storyPage === 0} onClick={() => setStoryPage((page) => page - 1)}>Précédent</button>
           <button className="soft-button" type="button" onClick={() => storyPage < prologue.length - 1 ? setStoryPage((page) => page + 1) : complete()}>{storyPage < prologue.length - 1 ? "Continuer" : "Entrer dans le bureau"}</button>
-          <button className="prologue-skip" type="button" onClick={() => complete(true)}>Passer le prologue</button>
         </div>
         </div>
       </div>

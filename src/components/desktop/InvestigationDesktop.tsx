@@ -621,14 +621,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
           {selectedStoryClue ? <section className="file-preview" aria-label="Réflexion de Max">
             <p>{selectedStoryClue.detail}</p>
             <div className="story-actions">
-            <button className="soft-button" type="button"
-              disabled={progress.storyClueIds?.includes(selectedEmail.id)}
-              onClick={() => {
-                setProgress((current) => ({ ...current, storyClueIds: [...new Set([...(current.storyClueIds ?? []), selectedEmail.id])] }));
-                setAnnouncement("Passage gardé dans le carnet de Max.");
-              }}>
-              {progress.storyClueIds?.includes(selectedEmail.id) ? "Passage gardé dans mon carnet" : "Garder ce passage dans mon carnet"}
-            </button>
             <button className="soft-button" type="button" onClick={() => {
               setProgress((current) => ({ ...current, storyClueIds: [...new Set([...(current.storyClueIds ?? []), selectedEmail.id])] }));
               selectMessage(selectedStoryClue.next);
@@ -637,7 +629,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
             <small>En suivant la piste suivante, ce passage est aussi conservé dans ton carnet.</small>
           </section> : null}
 
-          <div className="mail-space__toolbar">
+          {!selectedStoryClue && !analysisOpen ? <div className="mail-space__toolbar">
             <button
               className="soft-button"
               type="button"
@@ -647,9 +639,9 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
             >
               Analyser ce message
             </button>
-          </div>
+          </div> : null}
 
-          {analysisOpen ? (
+          {analysisOpen && !selectedStoryClue ? (
             <section className="analysis-sheet" id="analysis-panel" aria-labelledby="analysis-title">
               <header>
                 <div>

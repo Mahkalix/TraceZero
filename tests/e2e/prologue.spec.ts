@@ -29,7 +29,7 @@ test('le son reste actif dans le bureau et le volume est mémorisé', async ({ p
   await page.getByRole('button', { name: 'Couper le son' }).click();
   await expect(page.getByRole('button', { name: 'Activer le son' })).toHaveAttribute('aria-pressed', 'false');
   await page.getByRole('button', { name: 'Activer le son' }).click();
-  await page.getByRole('button', { name: 'Passer le prologue' }).click();
+  await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Volume de la musique' }).click();
   await expect(page.getByRole('button', { name: 'Couper le son' })).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('slider', { name: 'Volume', exact: true }).fill('25');
@@ -67,7 +67,7 @@ test("le bureau reste masqué entre le titre et le prologue", async ({ page }) =
   await page.clock.runFor(600);
   await expect(page.getByRole('dialog', { name: 'La dernière soirée — prologue' })).toBeVisible();
   await expect(page.locator('.station-content')).toHaveCSS('opacity', '0');
-  await page.getByRole('button', { name: 'Passer le prologue' }).click();
+  await page.keyboard.press('Escape');
   await expect(page.locator('.station-content')).toHaveCSS('opacity', '1');
 });
 
@@ -94,7 +94,7 @@ test("Max découvre le contexte à son rythme puis peut le relire", async ({ pag
   await page.getByText("Options du dossier", { exact: true }).click();
   await page.getByRole("button", { name: "Relire le prologue" }).click();
   await expect(story.getByRole("heading")).toHaveText("Tu t’appelles Max.");
-  await story.getByRole("button", { name: "Passer le prologue" }).click();
+  await page.keyboard.press("Escape");
   await expect(page.getByRole("main")).toBeFocused();
 });
 
