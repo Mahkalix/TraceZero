@@ -605,7 +605,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                   <span className="micro-label">Analyse</span>
                   <h3 id="analysis-title">Quels signaux sont suspects ?</h3>
                 </div>
-                <span>{signals.length}/4</span>
+                <span>{signals.length} sélectionné{signals.length > 1 ? "s" : ""}</span>
               </header>
 
               <p className="analysis-hint">Message analysé : <strong>{selectedEmail.subject}</strong></p>
