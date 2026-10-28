@@ -1,0 +1,78 @@
+@use "tokens" as *;
+
+body { color: $station-text; background: $station-bg; }
+.entry-os, .judy-os { color: $station-text; background: $station-bg; }
+.entry-os__wallpaper, .judy-os__wallpaper { filter: grayscale(1) brightness(.45); }
+.entry-os__veil, .judy-os__veil {
+  background: repeating-linear-gradient(90deg, transparent 0 79px, $station-reflection 80px), repeating-linear-gradient(0deg, transparent 0 79px, $station-reflection 80px);
+}
+.entry-menubar, .os-menubar, .os-dock, .app-window, .notes-inspector, .entry-guide {
+  background: $station-glass; border-color: $station-border;
+  backdrop-filter: blur($station-blur); box-shadow: $station-shadow;
+}
+.entry-guide, .app-window, .notes-inspector { border-radius: $station-radius; }
+.app-window__chrome, .notes-inspector__header, .guide-chrome { background: $station-glass; border-color: $station-border; }
+.app-window__body, .mail-space__reader, .analysis-sheet, .case-home__content, .entry-guide__body { background: $station-reading; }
+.app-window[data-foreground="false"] { border-color: $station-reflection; }
+.app-window[data-foreground="true"] { border-color: rgba($color-accent,.5); }
+.entry-card h1, .entry-guide h2, .app-window strong, .case-home h2 { color: $station-text; }
+.entry-card p, .entry-card .entry-explanation, .entry-card small, .entry-guide p, .entry-footer, .system-host,
+.case-home p, .mail-space__body, .mail-space__meta, .case-home .micro-label, .case-home__meta span,
+.layout-reset, .notes-toggle, .desktop-identity small, .guide-chrome, .case-avatar small, .case-avatar em { color: $station-muted; }
+.entry-eyebrow, .entry-guide li > span, .desktop-identity > span, .case-avatar > span, .status-pill,
+.note-card > span, .terminal-command > span { color: $color-accent; }
+.entry-button, .soft-button { background: $color-accent; color: $station-on-accent; border-color: $color-accent; }
+.entry-button:hover, .soft-button:hover { background: $color-accent-strong; color: $station-on-accent; }
+.os-status-dot, .dock-app[data-open="true"]::after, .timeline-list li[data-active="true"]::after { background: $color-accent; box-shadow: none; }
+.case-avatar { background: $station-chrome; border-color: $station-border; }
+.case-avatar > span { background: $station-surface; border-color: $station-border; }
+.investigation-next { border-color: $color-accent; }
+.window-controls button { color: $station-text; background: $station-surface; }
+.window-controls button:hover { background: $color-accent !important; color: $station-on-accent; }
+button:focus-visible, a:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline-color: $color-accent; box-shadow: 0 0 0 .2rem rgba($color-accent,.16); }
+@supports not (backdrop-filter: blur($blur-93)) {
+  .entry-menubar, .os-menubar, .os-dock, .app-window, .notes-inspector, .entry-guide,
+  .app-window__chrome, .notes-inspector__header, .guide-chrome { background: $station-chrome; }
+}
+
+.station-content { position: relative; --boot-duration-ms: #{$boot-duration-ms}; --boot-reduced-ms: #{$boot-reduced-ms}; }
+.station-content[data-boot-phase="checking"] { opacity: 0; }
+.station-content[data-boot-phase="playing"] .app-window,
+.station-content[data-boot-phase="playing"] .os-menubar,
+.station-content[data-boot-phase="playing"] .os-dock { backdrop-filter: none; }
+.boot-replay { position: fixed; bottom: $space-3; right: $space-4; z-index: 130; padding: $space-2; border: 1px solid $station-border; border-radius: $radius-sm; background: $station-chrome; color: $station-muted; font: .65rem var(--font-mono), monospace; cursor: pointer; }
+.station-boot { position: fixed; inset: 0; z-index: 1200; background: $station-bg; color: $station-text; pointer-events: none; }
+.boot-skip { position: absolute; z-index: 2; top: $space-6; right: $space-6; padding: $space-3 $space-4; border: 1px solid $station-border; border-radius: $radius-sm; background: $station-chrome; color: $station-text; cursor: pointer; pointer-events: auto; }
+.boot-skip span { color: $station-muted; margin-left: $space-4; font: .7rem var(--font-mono), monospace; }
+.boot-scene { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; }
+.boot-grid { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 79px, $station-reflection 80px), repeating-linear-gradient(0deg, transparent 0 79px, $station-reflection 80px); animation: boot-materialize $motion-normal $motion-ease $timing-81 both; }
+.boot-console { width: min(44rem, calc(100% - 3rem)); position: relative; }
+.boot-caption { font: .7rem var(--font-mono), monospace; color: $station-muted; letter-spacing: .15em; }
+.boot-lines { margin: $space-6 0; font: clamp(.6rem, 2vw, .8rem) var(--font-mono), monospace; }
+.boot-lines p { display: flex; justify-content: space-between; margin: $space-4 0; animation: boot-materialize $motion-normal $motion-ease both; }
+.boot-lines p:nth-child(2) { animation-delay: $timing-82; }
+.boot-lines p:nth-child(3) { animation-delay: $timing-83; }
+.boot-lines span { color: $station-muted; }
+.boot-brand { display: grid; gap: $space-4; padding: $space-6 0; border-top: 1px solid $station-border; animation: boot-materialize $motion-normal $motion-ease $timing-84 both; }
+.boot-brand strong { font-size: clamp(2.7rem, 9vw, 5rem); font-weight: 500; letter-spacing: -.065em; animation: boot-align $timing-85 $motion-ease $timing-84 both; }
+.boot-brand strong > span, .boot-symbol { color: $color-accent; animation: boot-materialize $motion-normal $motion-ease $timing-86 both; }
+.boot-symbol { font: 2rem var(--font-mono), monospace; }
+.boot-brand small { font: .65rem var(--font-mono), monospace; letter-spacing: .15em; color: $station-muted; }
+.boot-panels { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: $space-3; }
+.boot-panels > span { height: $space-7; border: 1px solid $station-border; border-radius: $radius-sm; background: $station-chrome; animation: boot-materialize $motion-normal $motion-ease $timing-87 both; }
+.boot-panels > span:nth-child(2) { animation-delay: $timing-88; }
+.boot-panels > span:nth-child(3) { animation-delay: $timing-89; }
+.boot-scan { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: rgba($color-accent,.3); animation: boot-scan $timing-90 linear $timing-91 both; }
+.boot-static { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; color: $color-accent; font: 1rem var(--font-mono), monospace; }
+.station-boot[data-reduced="true"] .boot-scene { display: none; }
+.station-boot[data-reduced="true"] { animation: boot-materialize $motion-reduced $motion-ease both; }
+.evidence-notice { position: fixed; top: 4.5rem; right: $space-5; max-width: min(28rem, calc(100% - 3rem)); z-index: 200; pointer-events: none; padding: $space-4; border: 1px solid $color-accent; border-radius: $radius-sm; background: $station-surface; color: $color-accent; font: .75rem var(--font-mono), monospace; animation: evidence-moment $timing-92 $motion-ease both; }
+@keyframes boot-materialize { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes boot-align { 0% { opacity: 0; transform: translateX(-6px); } 40% { opacity: .7; transform: translateX(3px); } 100% { opacity: 1; transform: translateX(0); } }
+@keyframes boot-scan { from { transform: translateY(-10vh); opacity: 0; } 10%, 90% { opacity: 1; } to { transform: translateY(110vh); opacity: 0; } }
+@keyframes evidence-moment { 0% { opacity: 0; transform: translateX(-3px); } 12% { opacity: 1; transform: translateX(2px); } 24%, 80% { opacity: 1; transform: translateX(0); } 100% { opacity: 0; transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .boot-scene, .evidence-notice { display: none !important; }
+  .station-boot *, .station-boot { animation: none !important; }
+}
+@media (max-width: 58rem) { .boot-replay { position: absolute; bottom: $space-1; right: $space-3; } }

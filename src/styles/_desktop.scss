@@ -17,7 +17,7 @@
   position: relative;
   overflow: hidden;
   color: $color-text;
-  background: #080a0c;
+  background: $material-14;
 }
 
 .judy-os__wallpaper {
@@ -35,8 +35,8 @@
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(180deg, rgb(5 7 9 / 10%), rgb(5 7 9 / 34%)),
-    radial-gradient(circle at 62% 18%, rgb(56 167 181 / 5%), transparent 30rem);
+    linear-gradient(180deg, $material-28, $material-29),
+    radial-gradient(circle at 62% 18%, $material-30, transparent 30rem);
 }
 
 .os-menubar {
@@ -52,13 +52,13 @@
   align-items: center;
   gap: $space-4;
   padding: 0 $space-4;
-  border: 1px solid rgb(255 255 255 / 12%);
+  border: 1px solid $material-31;
   border-radius: 1rem;
-  background: rgb(13 16 19 / 54%);
+  background: $material-32;
   box-shadow:
-    0 0.75rem 2.5rem rgb(0 0 0 / 22%),
-    inset 0 1px 0 rgb(255 255 255 / 7%);
-  backdrop-filter: blur(24px) saturate(1.1);
+    0 0.75rem 2.5rem $material-33,
+    inset 0 1px 0 $material-34;
+  backdrop-filter: blur($blur-77) saturate(1.1);
   font-family: var(--font-mono), monospace;
   font-size: 0.6rem;
 }
@@ -87,8 +87,8 @@
   width: 1.6rem;
   height: 1.6rem;
   border-radius: 0.5rem;
-  color: #0c1114;
-  background: rgb(225 231 229 / 92%);
+  color: $material-15;
+  background: $material-35;
   font-size: 0.52rem;
   font-weight: 900;
 }
@@ -97,8 +97,8 @@
   width: 0.42rem;
   height: 0.42rem;
   border-radius: 50%;
-  background: #9ccfc3;
-  box-shadow: 0 0 0.6rem rgb(156 207 195 / 38%);
+  background: $material-16;
+  box-shadow: 0 0 0.6rem $material-36;
 }
 
 .layout-reset,
@@ -134,12 +134,12 @@
 
 .app-window,
 .notes-inspector {
-  border: 1px solid rgb(255 255 255 / 12%);
-  background: rgb(12 15 18 / 67%);
+  border: 1px solid $material-31;
+  background: $material-37;
   box-shadow:
-    0 2rem 6rem rgb(0 0 0 / 32%),
-    inset 0 1px 0 rgb(255 255 255 / 8%);
-  backdrop-filter: blur(28px) saturate(1.08);
+    0 2rem 6rem $material-38,
+    inset 0 1px 0 $material-39;
+  backdrop-filter: blur($blur-78) saturate(1.08);
 }
 
 .app-window {
@@ -174,7 +174,7 @@
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding: 0 $space-4;
-  border-bottom: 1px solid rgb(255 255 255 / 8%);
+  border-bottom: 1px solid $material-39;
   cursor: grab;
   user-select: none;
   touch-action: none;
@@ -186,7 +186,7 @@
 
 .app-window__chrome:focus-visible,
 .notes-inspector__header:focus-visible {
-  outline: 0.14rem solid rgb(224 231 229 / 70%);
+  outline: 0.14rem solid $material-40;
   outline-offset: -0.2rem;
 }
 
@@ -201,18 +201,18 @@
     padding: 0;
     border: 0;
     border-radius: 50%;
-    background: rgb(255 255 255 / 18%);
+    background: $material-41;
   }
 
   button {
     cursor: pointer;
 
     &:first-child:hover {
-      background: rgb(206 111 111 / 82%);
+      background: $material-42;
     }
 
     &:nth-child(2):hover {
-      background: rgb(209 185 112 / 82%);
+      background: $material-43;
     }
   }
 }
@@ -257,9 +257,9 @@
   justify-content: space-between;
   gap: $space-3;
   padding: 0 $space-4;
-  border-bottom: 1px solid rgb(255 255 255 / 8%);
-  background: rgb(13 16 19 / 82%);
-  backdrop-filter: blur(22px);
+  border-bottom: 1px solid $material-39;
+  background: $material-44;
+  backdrop-filter: blur($blur-79);
   cursor: grab;
   user-select: none;
   touch-action: none;
@@ -279,7 +279,7 @@
     border: 0;
     border-radius: 50%;
     color: $color-text-muted;
-    background: rgb(255 255 255 / 6%);
+    background: $material-45;
     cursor: pointer;
   }
 }
@@ -301,7 +301,7 @@
 
     &[aria-selected="true"] {
       color: $color-text;
-      background: rgb(255 255 255 / 8%);
+      background: $material-39;
     }
   }
 }
@@ -324,12 +324,12 @@
   display: grid;
   gap: $space-2;
   padding: $space-3;
-  border: 1px solid rgb(255 255 255 / 8%);
+  border: 1px solid $material-39;
   border-radius: 0.85rem;
-  background: rgb(255 255 255 / 3%);
+  background: $material-46;
 
   > span {
-    color: #8ebec1;
+    color: $material-17;
     font-family: var(--font-mono), monospace;
     font-size: 0.54rem;
   }
@@ -347,7 +347,7 @@
 }
 
 .note-card--hypothesis {
-  background: linear-gradient(135deg, rgb(171 96 138 / 7%), transparent 75%);
+  background: linear-gradient(135deg, $material-47, transparent 75%);
 }
 
 .micro-label {
@@ -371,17 +371,17 @@
 }
 
 .soft-button {
-  border: 1px solid rgb(255 255 255 / 16%);
-  color: #111517;
-  background: rgb(226 232 230 / 92%);
+  border: 1px solid $material-48;
+  color: $material-18;
+  background: $material-49;
 
   &:hover:not(:disabled) {
-    background: #fff;
+    background: $material-19;
   }
 
   &:disabled {
     color: $color-text-subtle;
-    background: rgb(255 255 255 / 5%);
+    background: $material-50;
     cursor: not-allowed;
   }
 }
@@ -393,9 +393,9 @@
 }
 
 .ghost-button {
-  border: 1px solid rgb(255 255 255 / 9%);
+  border: 1px solid $material-51;
   color: $color-text-muted;
-  background: rgb(255 255 255 / 3%);
+  background: $material-46;
 }
 
 .case-home {
@@ -411,7 +411,7 @@
   aspect-ratio: 0.82;
   overflow: hidden;
   border-radius: 1.2rem;
-  background: rgb(255 255 255 / 3%);
+  background: $material-46;
 
   img {
     width: 100%;
@@ -448,7 +448,7 @@
     padding: 0.45rem 0.65rem;
     border-radius: 999px;
     color: $color-text-subtle;
-    background: rgb(255 255 255 / 4%);
+    background: $material-52;
     font-family: var(--font-mono), monospace;
     font-size: 0.56rem;
   }
@@ -459,9 +459,9 @@
   gap: 0.25rem;
   margin: $space-5 0;
   padding: $space-4;
-  border: 1px solid rgb(145 200 187 / 15%);
+  border: 1px solid $material-53;
   border-radius: 0.9rem;
-  background: rgb(145 200 187 / 5%);
+  background: $material-54;
 
   span {
     color: $color-text-subtle;
@@ -480,8 +480,8 @@
 }
 
 .mail-space__sidebar {
-  border-right: 1px solid rgb(255 255 255 / 8%);
-  background: rgb(255 255 255 / 1.5%);
+  border-right: 1px solid $material-39;
+  background: $material-7;
 }
 
 .space-sidebar__heading {
@@ -521,11 +521,11 @@
 
   &[data-active="true"] {
     color: $color-text;
-    background: rgb(255 255 255 / 9%);
+    background: $material-51;
   }
 
   &:hover:not([data-active="true"]) {
-    background: rgb(255 255 255 / 4%);
+    background: $material-52;
   }
 }
 
@@ -535,7 +535,7 @@
   width: 1.9rem;
   height: 1.9rem;
   border-radius: 0.58rem;
-  background: rgb(255 255 255 / 6%);
+  background: $material-45;
   font-family: var(--font-mono), monospace;
   font-size: 0.62rem;
 }
@@ -587,15 +587,15 @@
 .status-pill {
   padding: 0.4rem 0.6rem;
   border-radius: 999px;
-  color: #dbcbd5;
-  background: rgb(185 84 139 / 12%);
+  color: $material-20;
+  background: $material-55;
   font-family: var(--font-mono), monospace;
   font-size: 0.5rem;
 }
 
 .status-pill--warning {
-  color: #e4cfb7;
-  background: rgb(193 132 78 / 14%);
+  color: $material-21;
+  background: $material-56;
 }
 
 .mail-space__meta {
@@ -606,7 +606,7 @@
     grid-template-columns: 2.6rem 1fr;
     gap: $space-3;
     padding: $space-2 0;
-    border-bottom: 1px solid rgb(255 255 255 / 7%);
+    border-bottom: 1px solid $material-34;
   }
 
   dt,
@@ -639,9 +639,9 @@
   gap: $space-3;
   margin-top: $space-4;
   padding: $space-4;
-  border: 1px solid rgb(255 255 255 / 8%);
+  border: 1px solid $material-39;
   border-radius: 0.9rem;
-  background: rgb(255 255 255 / 3%);
+  background: $material-46;
 
   > div {
     display: grid;
@@ -671,9 +671,9 @@
 .analysis-sheet {
   margin-top: $space-4;
   padding: $space-4;
-  border: 1px solid rgb(255 255 255 / 9%);
+  border: 1px solid $material-51;
   border-radius: 1rem;
-  background: rgb(8 11 14 / 44%);
+  background: $material-57;
 
   > header {
     display: flex;
@@ -710,16 +710,16 @@
   padding: 0 $space-3;
   border-radius: 0.7rem;
   color: $color-text-muted;
-  background: rgb(255 255 255 / 3%);
+  background: $material-46;
   cursor: pointer;
 
   &:has(input:checked) {
     color: $color-text;
-    background: rgb(129 186 190 / 11%);
+    background: $material-58;
   }
 
   input {
-    accent-color: #99c7c8;
+    accent-color: $material-22;
   }
 }
 
@@ -758,9 +758,9 @@
   display: grid;
   gap: $space-2;
   padding: $space-4;
-  border: 1px solid rgb(255 255 255 / 8%);
+  border: 1px solid $material-39;
   border-radius: 0.9rem;
-  background: rgb(255 255 255 / 3%);
+  background: $material-46;
 
   strong {
     font-size: 0.8rem;
@@ -772,14 +772,14 @@
 }
 
 .session-node--unknown {
-  border-color: rgb(195 125 120 / 18%);
-  background: rgb(195 125 120 / 5%);
+  border-color: $material-59;
+  background: $material-60;
 }
 
 .session-link {
   position: relative;
   height: 1px;
-  background: rgb(255 255 255 / 16%);
+  background: $material-48;
   text-align: center;
 
   span {
@@ -787,7 +787,7 @@
     top: -0.55rem;
     padding: 0 $space-2;
     color: $color-text-subtle;
-    background: rgb(16 19 22 / 88%);
+    background: $material-61;
     font-family: var(--font-mono), monospace;
     font-size: 0.54rem;
   }
@@ -795,7 +795,7 @@
 
 .event-stream {
   margin-bottom: $space-5;
-  border-top: 1px solid rgb(255 255 255 / 8%);
+  border-top: 1px solid $material-39;
 }
 
 .event-stream__row {
@@ -803,7 +803,7 @@
   grid-template-columns: 4.5rem 8rem 8rem minmax(10rem, 1fr);
   gap: $space-3;
   padding: $space-3 0;
-  border-bottom: 1px solid rgb(255 255 255 / 7%);
+  border-bottom: 1px solid $material-34;
   color: $color-text-muted;
   font-family: var(--font-mono), monospace;
   font-size: 0.6rem;
@@ -818,10 +818,10 @@
   min-height: 21rem;
   margin-top: $space-5;
   padding: $space-4;
-  border: 1px solid rgb(255 255 255 / 8%);
+  border: 1px solid $material-39;
   border-radius: 0.9rem;
-  color: #b6cfcc;
-  background: rgb(1 4 6 / 58%);
+  color: $material-23;
+  background: $material-62;
   font-family: var(--font-mono), monospace;
   font-size: 0.66rem;
   line-height: 1.62;
@@ -835,7 +835,7 @@
   color: $color-text;
 
   span {
-    color: #8ebec1;
+    color: $material-17;
   }
 }
 
@@ -846,12 +846,12 @@
   gap: $space-2;
   margin-top: $space-3;
   padding: 0 $space-2;
-  border: 1px solid rgb(255 255 255 / 8%);
+  border: 1px solid $material-39;
   border-radius: 0.75rem;
-  background: rgb(255 255 255 / 3%);
+  background: $material-46;
 
   label {
-    color: #8ebec1;
+    color: $material-17;
     font-family: var(--font-mono), monospace;
     font-size: 0.6rem;
   }
@@ -871,8 +871,8 @@
     padding: 0 $space-3;
     border: 0;
     border-radius: 0.58rem;
-    color: #101416;
-    background: rgb(224 231 229 / 90%);
+    color: $material-24;
+    background: $material-63;
     cursor: pointer;
   }
 }
@@ -883,7 +883,7 @@
   font-size: 0.6rem;
 
   code {
-    color: #8ebec1;
+    color: $material-17;
   }
 }
 
@@ -900,16 +900,16 @@
   gap: $space-3;
   min-height: 3.3rem;
   padding: 0 $space-3;
-  border: 1px solid rgb(255 255 255 / 7%);
+  border: 1px solid $material-34;
   border-radius: 0.75rem;
   color: $color-text-muted;
-  background: rgb(255 255 255 / 2.5%);
+  background: $material-64;
   text-align: left;
   cursor: pointer;
 
   &[data-suspect="true"] {
-    border-color: rgb(193 132 78 / 18%);
-    background: rgb(193 132 78 / 4%);
+    border-color: $material-65;
+    background: $material-66;
   }
 
   strong {
@@ -931,7 +931,7 @@
   width: 2rem;
   height: 2rem;
   border-radius: 0.55rem;
-  background: rgb(255 255 255 / 5%);
+  background: $material-50;
   font-family: var(--font-mono), monospace;
 }
 
@@ -956,7 +956,7 @@
       top: 0.35rem;
       bottom: -0.35rem;
       width: 1px;
-      background: rgb(255 255 255 / 8%);
+      background: $material-39;
     }
 
     &::after {
@@ -967,11 +967,11 @@
       width: 0.5rem;
       height: 0.5rem;
       border-radius: 50%;
-      background: rgb(255 255 255 / 14%);
+      background: $material-67;
     }
 
     &[data-active="true"]::after {
-      background: #9ccfc3;
+      background: $material-16;
     }
 
     time {
@@ -1021,13 +1021,13 @@
   align-items: flex-end;
   gap: $space-2;
   padding: $space-2;
-  border: 1px solid rgb(255 255 255 / 13%);
+  border: 1px solid $material-68;
   border-radius: 1.25rem;
-  background: rgb(18 21 24 / 53%);
+  background: $material-69;
   box-shadow:
-    0 1rem 3rem rgb(0 0 0 / 24%),
-    inset 0 1px 0 rgb(255 255 255 / 9%);
-  backdrop-filter: blur(26px) saturate(1.15);
+    0 1rem 3rem $material-70,
+    inset 0 1px 0 $material-51;
+  backdrop-filter: blur($blur-80) saturate(1.15);
 }
 
 .dock-app {
@@ -1039,16 +1039,16 @@
   border: 0;
   border-radius: 0.85rem;
   color: $color-text-muted;
-  background: rgb(255 255 255 / 5%);
+  background: $material-50;
   cursor: pointer;
   transition:
-    transform 150ms ease,
-    background-color 150ms ease;
+    transform $timing-75 ease,
+    background-color $timing-75 ease;
 
   &:hover {
     transform: translateY(-0.3rem);
     color: $color-text;
-    background: rgb(255 255 255 / 9%);
+    background: $material-51;
   }
 
   &[data-open="true"]::after {
@@ -1058,12 +1058,12 @@
     width: 0.25rem;
     height: 0.25rem;
     border-radius: 50%;
-    background: rgb(220 228 226 / 70%);
+    background: $material-71;
   }
 
   &[data-active="true"] {
     color: $color-text;
-    background: rgb(255 255 255 / 12%);
+    background: $material-31;
   }
 }
 
@@ -1078,15 +1078,15 @@
   left: 50%;
   transform: translateX(-50%) translateY(0.2rem);
   padding: 0.32rem 0.5rem;
-  border: 1px solid rgb(255 255 255 / 10%);
+  border: 1px solid $material-72;
   border-radius: 0.45rem;
   color: $color-text;
-  background: rgb(14 17 20 / 88%);
+  background: $material-73;
   opacity: 0;
   pointer-events: none;
   white-space: nowrap;
   font-size: 0.54rem;
-  transition: 130ms ease;
+  transition: $timing-76 ease;
 }
 
 .dock-app:hover .dock-app__label,
@@ -1173,7 +1173,7 @@
     max-height: 15rem;
     overflow: auto;
     border-right: 0;
-    border-bottom: 1px solid rgb(255 255 255 / 8%);
+    border-bottom: 1px solid $material-39;
   }
 
   .session-map {
@@ -1220,14 +1220,14 @@
 .file-preview {
   margin: 1rem;
   padding: 1rem;
-  border: 1px solid rgb(255 255 255 / 15%);
+  border: 1px solid $material-74;
   border-radius: .75rem;
   pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .8rem; line-height: 1.7; }
 }
 
-.investigation-next { border-left: 2px solid #94d5c5; padding-left: .8rem; }
+.investigation-next { border-left: 2px solid $material-25; padding-left: .8rem; }
 .restart-case { margin-top: 1.5rem; }
 .save-warning {
   position: fixed; top: 3rem; left: 1rem; right: 1rem; z-index: 300;
-  padding: .75rem 1rem; border-radius: .5rem; background: #45321c; color: #fff0cf;
+  padding: .75rem 1rem; border-radius: .5rem; background: $material-26; color: $material-27;
 }
