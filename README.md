@@ -95,3 +95,5 @@ Le dossier 001 fonctionne sans backend. Les futurs chapitres et la synchronisati
 Fond de l’appartement : image de présentation de [Cyberpunk 2077 — Judy’s Apartment, par RC13](https://steamcommunity.com/sharedfiles/filedetails/?id=2321339181). Cette copie remplace le JPEG tronqué du dépôt ; les visuels du jeu restent la propriété de leurs ayants droit.
 
 Les explications sont disponibles à la demande via « Comment jouer » dans la barre système (icône ? sur mobile). Le guide utilise une boîte de dialogue native, fermable par son bouton, Échap ou un clic sur le fond. Le portrait de Judy a été fourni par l’utilisateur ; son nom utilise Chakra Petch comme le titre de l’intro.
+
+Le fond actif du bureau est `forensic-workstation.webp`, fourni par l’utilisateur. Le portrait et l’intro restent inchangés.

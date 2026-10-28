@@ -41,7 +41,7 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
 
   await expect(page.locator("img.judy-os__wallpaper")).toHaveAttribute(
     "src",
-    "/judy-apartment.jpg",
+    "/forensic-workstation.webp",
   );
 
   await expect(page.getByRole("heading", { name: "Judy Alvarez" })).toBeVisible();
