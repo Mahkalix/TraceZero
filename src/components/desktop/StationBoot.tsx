@@ -106,7 +106,7 @@ export function StationBoot({ children }: { children?: ReactNode }) {
         </div>
       </div>
       {reduced ? <p className="boot-static">Trace//Zero · Dossier 001 prêt</p> : null}
-      <p className="cinema-credit">github.com/Mahkalix</p>
+      <p className="cinema-credit">GitHub · Maxence Badin-Léger aka @Mahkalix</p>
     </section> : null}
     {phase === "story" ? <section ref={storyRef} tabIndex={-1} className="station-boot narrative-prologue" role="dialog" aria-modal="true" aria-label="La dernière soirée — prologue" onKeyDown={(event) => {
       if (event.key === "Escape") { event.preventDefault(); complete(true); }

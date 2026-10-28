@@ -63,6 +63,8 @@
   span { width: 2rem; height: 2rem; background: url('/trace-mark.svg') center / contain no-repeat; }
 }
 .cinema-credit {
+  padding-inline: 1.5rem;
+  line-height: 1.6;
   position: absolute;
   bottom: clamp(1.5rem, 4vw, 3rem);
   left: 0;
