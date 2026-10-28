@@ -100,6 +100,9 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
 
   await expect(page.getByText("Session réutilisée")).toBeVisible();
   await expect(page.getByText("Connexion simultanée")).toBeVisible();
+  await page.getByRole("tab", { name: "Hypothèse" }).click();
+  await expect(page.getByText("Ce que je peux en déduire", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Une autre machine utilise sa session/)).toBeVisible();
 
   await page.getByRole("button", { name: "Terminal", exact: true }).click();
   const input = page.getByLabel("judy@trace ~ %");
@@ -128,6 +131,10 @@ test("le joueur peut terminer tout le parcours du dossier 001", async ({ page })
 
   await page.reload();
   await expect(page.getByText("Quelqu’un a continué sous son nom.", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Carnet 6/6" }).click();
+  await page.getByRole("tab", { name: "Hypothèse" }).click();
+  await expect(page.getByText(/L’archive diffère de la référence laissée par Judy/)).toBeVisible();
+  await page.getByRole("button", { name: "Fermer le carnet" }).click();
   await page.getByRole("button", { name: "Recommencer le dossier", exact: true }).click();
   await page.getByRole("button", { name: "Confirmer le redémarrage" }).click();
   await expect(page.getByRole("button", { name: "Carnet 0/6" })).toBeVisible();

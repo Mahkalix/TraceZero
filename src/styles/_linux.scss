@@ -33,7 +33,7 @@
 .desktop-identity > span { font: .65rem var(--font-mono), monospace; letter-spacing: .25em; color: $material-119; }
 .desktop-identity strong { font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 400; letter-spacing: -.04em; }
 .desktop-identity small { font-size: .7rem; color: $material-120; }
-.os-stage { padding: 5.5rem 2.5rem 3rem 7rem; height: 100dvh; min-height: 0; }
+.os-stage { padding: 5.5rem 2.5rem 7rem; height: 100dvh; min-height: 0; }
 .window-stack { height: 100%; min-height: 0; width: 100%; }
 .app-window { left: 1%; top: 0; min-height: min(32rem, calc(100dvh - 10rem)); max-height: calc(100dvh - 9rem); border-radius: .85rem; background: $material-121; }
 .app-window__body { max-height: calc(100dvh - 12.5rem); }
@@ -44,14 +44,14 @@
 .window-controls button { width: 1.65rem; height: 1.65rem; border-radius: .4rem; font: 1rem system-ui; background: $material-123; color: $material-124; }
 .app-window[data-maximized="true"] { left: 0; top: 0; width: 100% !important; height: 100%; max-height: 100%; transform: none !important; }
 .app-window[data-maximized="true"] .app-window__body { max-height: calc(100dvh - 12rem); }
-.os-dock { left: .9rem; top: 50%; bottom: auto; transform: translateY(-50%); flex-direction: column; gap: .8rem; padding: .65rem; border-radius: 1rem; background: $material-125; }
-.dock-home { padding-bottom: .8rem; margin: .2rem auto 0; border-bottom: 1px solid $material-126; }
+.os-dock { left: 50%; top: auto; bottom: 1rem; transform: translateX(-50%); flex-direction: row; gap: .8rem; padding: .65rem; border-radius: 1rem; background: $material-125; }
+.dock-home { padding-right: .8rem; margin: auto .2rem auto 0; border-right: 1px solid $material-126; }
 .dock-app { width: 2.8rem; height: 2.8rem; border-radius: .6rem; }
 .dock-app__glyph { font-size: 1.15rem; }
-.dock-app__label { left: 3.5rem; bottom: 50%; transform: translateY(50%); font-size: .72rem; }
-.dock-app:hover .dock-app__label, .dock-app:focus-visible .dock-app__label { transform: translateY(50%); }
-.dock-app:hover { transform: translateX(.15rem); }
-.dock-app[data-open="true"]::after { left: -.45rem; bottom: 50%; background: $material-102; }
+.dock-app__label { left: 50%; bottom: 3.5rem; transform: translateX(-50%); font-size: .72rem; }
+.dock-app:hover .dock-app__label, .dock-app:focus-visible .dock-app__label { transform: translateX(-50%); }
+.dock-app:hover { transform: translateY(-.15rem); }
+.dock-app[data-open="true"]::after { left: calc(50% - .125rem); bottom: -.38rem; background: $material-102; }
 .case-avatar { min-height: 17rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.25rem; background: linear-gradient(145deg, $material-127, $material-128); border: 1px solid $material-129; border-radius: 1rem; }
 .case-avatar > span { display: grid; place-items: center; width: 6rem; height: 6rem; border: 1px solid $material-130; background: $material-131; border-radius: 50%; font-size: 2.4rem; font-weight: 400; color: $material-132; }
 .case-avatar small { font: .65rem var(--font-mono), monospace; letter-spacing: .12em; color: $material-133; }

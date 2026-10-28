@@ -29,6 +29,7 @@ import {
   type InvestigationProgress,
 } from "@/features/investigation/progress";
 import { runTerminalCommand } from "@/features/investigation/terminal";
+import { notebookState } from "@/features/investigation/notebook";
 
 type ActiveApp =
   | "case"
@@ -165,6 +166,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   const hasHashEvidence = discovered.has("E06");
   const hypothesisValidated = progress.validatedHypothesisIds.includes("H01");
   const caseComplete = isCaseComplete(progress);
+  const notebook = notebookState(progress);
   const nextStoryClue = storyClueIds.find((id) => !progress.storyClueIds?.includes(id));
   const selectedStoryClue = storyClues[selectedEmail.id as StoryClueId];
   const nextAction = nextStoryClue
@@ -1013,7 +1015,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       </header>
 
       <section className="os-stage" aria-label="Bureau de Judy">
-        <div className="desktop-identity" aria-hidden="true"><strong>L’espace de Judy.</strong></div>
         <div className="window-stack">
           {openApps.map(renderWindow)}
 
@@ -1085,7 +1086,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                 <div className="notes-list" role="tabpanel">
                   {(progress.storyClueIds ?? []).map((id) => {
                     const clue = storyClues[id as StoryClueId];
-                    return clue ? <article className="note-card" key={id}><span>Dernière soirée</span><strong>{clue.title}</strong><p>{clue.detail}</p><button className="soft-button soft-button--small" type="button" onClick={() => selectMessage(id)}>Relire le message</button></article> : null;
+                    return clue ? <article className="note-card" key={id}><strong>{clue.title}</strong><p>{id === "mail-sent" && notebook.sentMessage ? notebook.sentMessage : clue.detail}</p><button className="soft-button soft-button--small" type="button" onClick={() => { setNotesOpen(false); selectMessage(id); }}>Relire le message</button></article> : null;
                   })}
                   {progress.discoveredEvidenceIds.length === 0 && !progress.storyClueIds?.length ? (
                     <p className="notes-empty">Aucune preuve pour l’instant.</p>
@@ -1098,6 +1099,13 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                           <span>{evidence.id}</span>
                           <strong>{evidence.title}</strong>
                           <p>{evidence.description}</p>
+                          <button className="soft-button soft-button--small" type="button" onClick={() => {
+                            setNotesOpen(false);
+                            if (id === "E01" || id === "E02") selectMessage(phishingEmailId);
+                            else if (id === "E03" || id === "E04") openApp("network");
+                            else if (id === "E05") openApp("files");
+                            else { setTerminalInput("sha256sum orion-export.zip"); openApp("terminal"); }
+                          }}>{id === "E06" ? "Vérifier à nouveau" : "Revoir la source"}</button>
                         </article>
                       );
                     })
@@ -1106,9 +1114,9 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
               ) : (
                 <div className="notes-list" role="tabpanel">
                   <article className="note-card note-card--hypothesis">
-                    <span>H01</span>
                     <strong>Phishing ciblé</strong>
-                    <p>Le message externe a servi à capturer la session ORION de Judy.</p>
+                    <p>{notebook.hypothesis}</p>
+                    {notebook.missing.length ? <p>À vérifier : {notebook.missing.join(" et ").toLowerCase()}.</p> : null}
                     <button
                       className="soft-button soft-button--small"
                       disabled={!hasPhishingEvidence || hypothesisValidated}
@@ -1118,6 +1126,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                       {hypothesisValidated ? "Hypothèse validée" : "Valider la conclusion"}
                     </button>
                   </article>
+                  {notebook.conclusions.length ? <article className="note-card"><strong>Ce que je peux en déduire</strong>{notebook.conclusions.map((conclusion) => <p key={conclusion}>{conclusion}</p>)}</article> : null}
                 </div>
               )}
             </aside>
