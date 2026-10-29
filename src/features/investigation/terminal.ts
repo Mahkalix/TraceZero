@@ -35,9 +35,13 @@ export function runTerminalCommand(raw: string): TerminalResult {
     case "cat notes.txt":
       return {
         output: [
-          "check active sessions tomorrow",
-          "something is wrong with the laptop token",
-          "reference hash stored in reference.sha256",
+          "12 octobre, 22 h 07 — Je devrais déjà être au café avec Max.",
+          "Nora avait raison sur un point : les deux versions d’ORION ne racontent pas la même chose.",
+          "Je voulais garder mon export pour comprendre avant d’accuser qui que ce soit.",
+          "Quelque chose ne colle pas avec ma session. Vérifier les accès actifs.",
+          "J’ai conservé l’empreinte de mon export dans reference.sha256.",
+          "Comparer avec : sha256sum orion-export.zip. Si l’empreinte diffère, ce n’est plus mon fichier.",
+          "Max, je te dois une explication. D’abord sortir d’ici.",
         ],
       };
     case "cat reference.sha256":

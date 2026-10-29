@@ -1,4 +1,8 @@
 "use client";
+import Link from "next/link";
+import { PlayerGuide } from "./PlayerGuide";
+import { SystemStatus } from "./SystemStatus";
+import { AudioControl } from "./SiteAudio";
 
 import {
   FormEvent,
@@ -12,17 +16,20 @@ import {
 import { evidenceCatalog } from "@/data/chapter-01/evidence";
 import { emails, phishingEmailId } from "@/data/chapter-01/emails";
 import { sessionEvents } from "@/data/chapter-01/network";
+import { storyClues, storyClueIds, type StoryClueId } from "@/data/chapter-01/story";
 import {
   analyzePhishingSignals,
   type PhishingSignal,
 } from "@/features/investigation/phishing";
 import {
   initialProgress,
+  isCaseComplete,
   readProgress,
   writeProgress,
   type InvestigationProgress,
 } from "@/features/investigation/progress";
 import { runTerminalCommand } from "@/features/investigation/terminal";
+import { notebookState } from "@/features/investigation/notebook";
 
 type ActiveApp =
   | "case"
@@ -33,7 +40,7 @@ type ActiveApp =
   | "timeline";
 
 type WindowKey = ActiveApp | "notes";
-type NotebookTab = "evidence" | "hypotheses";
+type NotebookTab = "leads" | "evidence" | "hypotheses";
 
 type WindowPosition = { x: number; y: number };
 
@@ -55,9 +62,7 @@ type TerminalLine = {
   output?: string;
 };
 
-const judyPortrait =
-  "https://1.bp.blogspot.com/-YF9OOw5rB-U/X9tAimobl0I/AAAAAAAAGEU/t1PHyHLWS_sz09PM7YustUT6GJJDsaKbACPcBGAsYHg/w914-h514-p-k-no-nu/judy-alvarez-cyberpunk-2077-uhdpaper.com-4K-8.2294-wp.thumbnail.jpg";
-const judyWallpaper = "/judy-apartment.jpg";
+const judyWallpaper = "/forensic-workstation.webp";
 
 const apps: Array<{
   id: ActiveApp;
@@ -96,13 +101,20 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   const [activeApp, setActiveApp] = useState<ActiveApp>("case");
   const [selectedEmailId, setSelectedEmailId] = useState(emails[0].id);
   const [analysisOpen, setAnalysisOpen] = useState(false);
+  const [analysisFeedback, setAnalysisFeedback] = useState<{ kind: "error" | "success" | "info"; message: string; details?: string[]; attempt: number } | null>(null);
+  const analysisFeedbackRef = useRef<HTMLDivElement>(null);
   const [signals, setSignals] = useState<PhishingSignal[]>([]);
-  const [notebookTab, setNotebookTab] = useState<NotebookTab>("evidence");
+  const [notebookTab, setNotebookTab] = useState<NotebookTab>("leads");
   const [notesOpen, setNotesOpen] = useState(false);
   const [progress, setProgress] =
     useState<InvestigationProgress>(initialProgress);
   const [hydrated, setHydrated] = useState(false);
   const [announcement, setAnnouncement] = useState("");
+  const [saveFailed, setSaveFailed] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [restartPending, setRestartPending] = useState(false);
+  const [maximizedApp, setMaximizedApp] = useState<ActiveApp | null>(null);
+  const [clock, setClock] = useState("Session locale");
   const [windowPositions, setWindowPositions] =
     useState<Record<WindowKey, WindowPosition>>(defaultWindowPositions);
   const [windowLayers, setWindowLayers] = useState<Record<WindowKey, number>>({
@@ -127,12 +139,19 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   const topLayerRef = useRef(20);
 
   useEffect(() => {
+    const update = () => setClock(new Intl.DateTimeFormat("fr-FR", { weekday: "short", hour: "2-digit", minute: "2-digit" }).format(new Date()));
+    update();
+    const timer = window.setInterval(update, 30000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
     setProgress(readProgress());
     setHydrated(true);
   }, []);
 
   useEffect(() => {
-    if (hydrated) writeProgress(progress);
+    if (hydrated) setSaveFailed(!writeProgress(progress));
   }, [hydrated, progress]);
 
   const selectedEmail = useMemo(
@@ -146,7 +165,39 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   const hasArchiveEvidence = discovered.has("E05");
   const hasHashEvidence = discovered.has("E06");
   const hypothesisValidated = progress.validatedHypothesisIds.includes("H01");
-  const caseComplete = hasHashEvidence;
+  const caseComplete = isCaseComplete(progress);
+  const notebook = notebookState(progress);
+  const nextStoryClue = storyClueIds.find((id) => !progress.storyClueIds?.includes(id));
+  const selectedStoryClue = storyClues[selectedEmail.id as StoryClueId];
+  const lead = caseComplete
+    ? { question: "Qu’est-ce que cette soirée nous apprend ?", action: "Lire la conclusion", hint: "Les passages et les traces sont réunis. Retourne au dossier pour faire le point." }
+    : nextStoryClue
+      ? { question: ({ "draft-max": "Pourquoi Judy me demandait-elle de la couvrir ?", "mail-003": "Que savait Nora ce soir-là ?", "mail-departure": "Quand Judy est-elle vraiment partie ?", "mail-sent": "Qui a écrit le dernier message de Judy ?" })[nextStoryClue], action: "Suivre cette piste", hint: "Lis le passage, puis garde-le dans ton carnet. Le bouton suivant ouvre l’échange à recouper. Tu peux aussi explorer librement les autres messages." }
+      : !hasPhishingEvidence
+        ? { question: "Comment quelqu’un aurait-il pu accéder au compte de Judy ?", action: "Examiner l’alerte reçue", hint: "Ouvre l’analyse de l’alerte de 21 h 52. Compare les domaines du lien et cherche ce qui pousse Judy à agir vite. Les autres mails ne sont pas des étapes obligatoires à valider." }
+        : !hypothesisValidated
+          ? { question: "L’alerte pouvait-elle servir à piéger Judy ?", action: "Relier les indices dans le carnet", hint: "Dans l’onglet Hypothèse du carnet, valide la conclusion appuyée par les deux preuves. Cela ouvre les connexions." }
+          : !hasNetworkEvidence
+            ? { question: "Une autre machine utilisait-elle sa session ?", action: "Comparer les connexions", hint: "Compare l’identifiant de session et les deux appareils, puis clique sur Confirmer l’anomalie." }
+            : { question: "L’archive est-elle encore celle que Judy avait conservée ?", action: "Vérifier l’archive", hint: "Lis notes.txt dans Fichiers. Dans le terminal, saisis sha256sum orion-export.zip puis Entrée pour comparer le fichier à la référence de Judy." };
+
+  function followLead() {
+    setNotesOpen(false);
+    if (caseComplete) openApp("case");
+    else if (nextStoryClue) selectMessage(nextStoryClue);
+    else if (!hasPhishingEvidence) { selectMessage(phishingEmailId); setAnalysisOpen(true); }
+    else if (!hypothesisValidated) { setNotebookTab("hypotheses"); setNotesOpen(true); focusWindow("notes"); }
+    else if (!hasNetworkEvidence) openApp("network");
+    else openApp("terminal");
+  }
+
+  function selectMessage(id: string) {
+    setSelectedEmailId(id);
+    setAnalysisOpen(false);
+    setAnalysisFeedback(null);
+    setSignals([]);
+    openApp("mail");
+  }
 
   function focusWindow(key: WindowKey) {
     topLayerRef.current += 1;
@@ -187,6 +238,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     setOpenApps(["case"]);
     setMinimizedApps([]);
     setNotesOpen(false);
+    setMaximizedApp(null);
     setActiveApp("case");
     topLayerRef.current = 20;
 
@@ -327,11 +379,12 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   }
 
   function startInvestigation() {
-    openApp("mail");
+    selectMessage(nextStoryClue ?? "mail-004");
     setProgress((current) => ({ ...current, currentStep: "mail" }));
   }
 
   function toggleSignal(signal: PhishingSignal) {
+    setAnalysisFeedback(null);
     setSignals((current) =>
       current.includes(signal)
         ? current.filter((item) => item !== signal)
@@ -340,23 +393,45 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
   }
 
   function validateAnalysis() {
+    const feedback = (kind: "error" | "success" | "info", message: string, details?: string[]) => {
+      setAnalysisFeedback((current) => ({ kind, message, details, attempt: (current?.attempt ?? 0) + 1 }));
+      window.requestAnimationFrame(() => analysisFeedbackRef.current?.scrollIntoView({ block: "nearest" }));
+    };
     if (selectedEmail.id !== phishingEmailId) {
-      setAnnouncement("Rien de suffisamment anormal sur ce message.");
+      if (!signals.length) {
+        feedback("info", `Aucun signal suspect relevé dans « ${selectedEmail.subject} ». Vous pouvez poursuivre : tous les messages ne contiennent pas une preuve.`);
+        return;
+      }
+      const explanations: Record<PhishingSignal, string> = {
+        sender: selectedEmail.from.endsWith("@helix.example")
+          ? `Expéditeur externe : non. L’adresse ${selectedEmail.from} utilise le domaine interne helix.example.`
+          : "Ce message vient d’un contact personnel. Une origine externe ne suffit pas à établir une tentative de phishing.",
+        domain: "Domaine ressemblant : aucun domaine d’imitation n’est présent dans ce message.",
+        link: "Destination réelle différente : aucun lien n’est présent dans ce message, il n’y a donc pas de destination à comparer.",
+        urgency: "Pression temporelle : le message n’impose ni délai court ni menace de suspension de compte.",
+      };
+      feedback("info", `Aucune preuve ajoutée pour « ${selectedEmail.subject} ». Les cases cochées ne correspondent pas aux éléments de cet email.`, signals.map((signal) => explanations[signal]));
       return;
     }
 
     const result = analyzePhishingSignals(signals);
 
     if (!result.isEnough) {
-      setAnnouncement("Deux indices sont nécessaires.");
+      feedback("error", signals.length === 0 ? "Sélectionnez au moins deux signaux suspects avant de valider l’analyse." : "Un seul signal est sélectionné. Relevez au moins un autre indice dans ce message.");
       return;
     }
 
     addEvidence(result.evidenceIds);
+    const newCount = result.evidenceIds.filter((id) => !discovered.has(id)).length;
+    if (result.evidenceIds.length < 2) {
+      feedback("info", `${newCount ? "Une preuve ajoutée au carnet." : "Cette preuve est déjà dans le carnet."} Ces signaux pointent vers le même domaine suspect. Cherchez aussi comment le message essaie de vous faire agir.`);
+      return;
+    }
+    feedback("success", newCount ? `${newCount} nouvelle${newCount > 1 ? "s" : ""} preuve${newCount > 1 ? "s" : ""} ajoutée${newCount > 1 ? "s" : ""} au carnet. Vous pouvez y valider l’hypothèse de phishing ciblé.` : "Ces preuves sont déjà dans le carnet. Vous pouvez y consulter ou valider l’hypothèse de phishing ciblé.");
     setNotebookTab("evidence");
     setNotesOpen(true);
     focusWindow("notes");
-    setAnnouncement("Deux preuves ont été ajoutées au carnet.");
+    setAnnouncement("Analyse terminée. Consultez le carnet pour valider l’hypothèse.");
   }
 
   function validateHypothesis() {
@@ -419,26 +494,26 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     return (
       <section className="case-home" aria-labelledby="case-title">
         <div className="case-home__portrait">
-          <img src={judyPortrait} alt="" />
+          <img src="/judy-alvarez.png" alt="Portrait de Judy Alvarez" />
         </div>
 
         <div className="case-home__content">
-          <span className="micro-label">
-            {caseComplete ? "CASE 001 / TRACE COMPLETE" : "CASE 001 / START HERE"}
-          </span>
           <h2 id="case-title">Judy Alvarez</h2>
 
           {caseComplete ? (
             <>
               <p>
-                La compromission est établie : phishing ciblé, réutilisation de
-                session puis export ORION dont l’empreinte ne correspond pas à
-                la référence de Judy.
+                Judy préparait quelque chose : elle me demandait de couvrir son départ
+                et conservait une référence de l’archive ORION. Puis une autre machine
+                a repris sa session, avant l’envoi du message qui accuse Nora.
               </p>
               <div className="case-result">
                 <span>6 preuves vérifiées</span>
-                <strong>Piste technique consolidée</strong>
+                <strong>Quelqu’un a continué sous son nom.</strong>
               </div>
+              <p>Si Nora dit vrai, Judy était déjà partie. Le dernier message ne suffit plus à l’accuser : son compte était utilisé ailleurs. L’archive a aussi changé, mais son empreinte ne dit ni qui l’a modifiée ni pourquoi.</p>
+              <p>Judy, pourquoi me demander de mentir avant même que tout commence ?</p>
+              <p className="investigation-next">Fin du chapitre 01 · Max sait désormais que les dernières traces de Judy ne racontent pas toutes sa soirée. Sa destination reste inconnue.</p>
               <button className="soft-button" type="button" onClick={() => openApp("timeline")}>
                 Voir la chronologie
               </button>
@@ -446,18 +521,37 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
           ) : (
             <>
               <p>
-                Judy a disparu il y a 36 heures. Commencez simplement par
-                regarder ses derniers messages.
+                Tu t’appelles Max. Il y a 36 heures, Judy devait te retrouver au café.
+                Elle n’est jamais venue. Tu retrouves son ordinateur encore allumé.
+                Un brouillon porte ton nom.
               </p>
               <div className="case-home__meta">
-                <span>Dernière activité · 22:44</span>
-                <span>Copie en lecture seule</span>
+                <span>12 octobre · le rendez-vous manqué</span>
+                <span>« Max, si on te demande… »</span>
               </div>
-              <button className="soft-button" type="button" onClick={startInvestigation}>
-                Ouvrir Messages
-              </button>
+              {!restartPending ? <div className="case-primary-action">
+                <button className="soft-button" type="button" onClick={progress.discoveredEvidenceIds.length || progress.storyClueIds?.length ? followLead : startInvestigation}>
+                  {progress.discoveredEvidenceIds.length || progress.storyClueIds?.length ? "Poursuivre l’enquête" : "Ouvrir Messages"}
+                </button>
+              </div> : null}
             </>
           )}
+          <div className="restart-case">
+            {restartPending ? <div className="restart-confirmation" role="group" aria-label="Recommencer le dossier">
+              <p>Effacer les preuves et recommencer ce dossier ?</p>
+              <div className="story-actions">
+              <button className="soft-button" type="button" onClick={() => {
+                setProgress(initialProgress); setSignals([]); setAnalysisOpen(false);
+                setTerminalLines([]); setSelectedFile(null); setRestartPending(false);
+                resetDesktopLayout(); setAnnouncement("Nouvelle enquête commencée.");
+              }}>Confirmer le redémarrage</button>
+              <button className="soft-button" type="button" onClick={() => setRestartPending(false)}>Annuler</button>
+              </div>
+            </div> : <details className="case-options"><summary>Options du dossier</summary><div className="story-actions">
+              <button className="soft-button" type="button" onClick={() => window.dispatchEvent(new Event("trace:prologue"))}>Relire le prologue</button>
+              <button className="soft-button" type="button" onClick={() => setRestartPending(true)}>Recommencer le dossier</button>
+            </div></details>}
+          </div>
         </div>
       </section>
     );
@@ -481,6 +575,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                 onClick={() => {
                   setSelectedEmailId(email.id);
                   setAnalysisOpen(false);
+                  setAnalysisFeedback(null);
                   setSignals([]);
                 }}
                 type="button"
@@ -504,6 +599,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
               <h2 id="mail-subject">{selectedEmail.subject}</h2>
             </div>
             {selectedEmail.external ? <span className="status-pill">EXTERNAL</span> : null}
+            {selectedEmail.draft ? <span className="status-pill">BROUILLON / NON ENVOYÉ</span> : null}
           </header>
 
           <dl className="mail-space__meta">
@@ -516,14 +612,24 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
 
             {selectedEmail.displayLink ? (
               <div className="link-inspector">
-                <span className="micro-label">Lien détecté</span>
                 <div><span>affiché</span><strong>{selectedEmail.displayLink}</strong></div>
                 <div><span>réel</span><code>{selectedEmail.actualLink}</code></div>
               </div>
             ) : null}
           </div>
 
-          <div className="mail-space__toolbar">
+          {selectedStoryClue ? <section className="file-preview" aria-label="Réflexion de Max">
+            <p>{selectedStoryClue.detail}</p>
+            <div className="story-actions">
+            <button className="soft-button" type="button" onClick={() => {
+              setProgress((current) => ({ ...current, storyClueIds: [...new Set([...(current.storyClueIds ?? []), selectedEmail.id])] }));
+              selectMessage(selectedStoryClue.next);
+            }}>{selectedStoryClue.action}</button>
+            </div>
+            <small>En suivant la piste suivante, ce passage est aussi conservé dans ton carnet.</small>
+          </section> : null}
+
+          {!selectedStoryClue && !analysisOpen ? <div className="mail-space__toolbar">
             <button
               className="soft-button"
               type="button"
@@ -533,17 +639,18 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
             >
               Analyser ce message
             </button>
-          </div>
+          </div> : null}
 
-          {analysisOpen ? (
+          {analysisOpen && !selectedStoryClue ? (
             <section className="analysis-sheet" id="analysis-panel" aria-labelledby="analysis-title">
               <header>
                 <div>
-                  <span className="micro-label">Analyse</span>
                   <h3 id="analysis-title">Quels signaux sont suspects ?</h3>
                 </div>
-                <span>{signals.length}/4</span>
+                <span>{signals.length} sélectionné{signals.length > 1 ? "s" : ""}</span>
               </header>
+
+              <p className="analysis-hint">Message analysé : <strong>{selectedEmail.subject}</strong></p>
 
               <fieldset>
                 <legend className="sr-only">Indices observés</legend>
@@ -561,9 +668,16 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                 )}
               </fieldset>
 
+              <p className="analysis-hint">Tous les messages ne sont pas suspects. Ne cochez que les indices présents. Deux signaux concordants permettent d’étayer une analyse de phishing ; un mail ordinaire ne bloque pas l’enquête.</p>
+
               <button className="soft-button" type="button" onClick={validateAnalysis}>
                 Valider l’analyse
               </button>
+              {analysisFeedback ? <div ref={analysisFeedbackRef} key={analysisFeedback.attempt} className="analysis-feedback" data-kind={analysisFeedback.kind} role={analysisFeedback.kind === "error" ? "alert" : "status"} aria-atomic="true"><strong>{analysisFeedback.kind === "error" ? "Analyse incomplète" : analysisFeedback.kind === "success" ? "Analyse confirmée" : "Résultat de l’analyse"}</strong><span>{analysisFeedback.message}</span>{analysisFeedback.details ? <ul>{analysisFeedback.details.map((detail) => <li key={detail}>{detail}</li>)}</ul> : null}</div> : null}
+              {analysisFeedback && selectedEmail.id !== phishingEmailId ? <div className="file-preview">
+                <p>Ce message n’est pas une étape à valider. Une autre piste : l’alerte de sécurité reçue à 21 h 52 demande à Judy d’agir en urgence.</p>
+                <button className="soft-button" type="button" onClick={() => selectMessage(phishingEmailId)}>Examiner l’alerte de sécurité</button>
+              </div> : null}
             </section>
           ) : null}
         </article>
@@ -575,7 +689,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     if (!hypothesisValidated) {
       return (
         <section className="empty-app">
-          <span className="micro-label">Réseau</span>
           <h2>Pas encore.</h2>
           <p>Le réseau ne devient pertinent qu’après avoir confirmé l’hypothèse de phishing.</p>
           <button
@@ -595,9 +708,9 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
 
     return (
       <section className="network-space" aria-labelledby="network-title">
+        <p className="investigation-next">Max / Le message de 22 h 47 accuse Nora. Est-ce vraiment Judy qui l’a envoyé ? Ces connexions peuvent montrer qui avait accès à son compte.</p>
         <header className="app-heading">
           <div>
-            <span className="micro-label">Session d’authentification</span>
             <h2 id="network-title">S-4831</h2>
           </div>
           <span className="status-pill status-pill--warning">2 appareils</span>
@@ -631,6 +744,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
         <button className="soft-button" type="button" onClick={compareSessions}>
           Confirmer l’anomalie
         </button>
+        {hasNetworkEvidence ? <div className="file-preview"><p>À 22 h 44, une autre machine utilise le compte de Judy. Trois minutes plus tard, un message accuse Nora. Le nom de Judy dans l’expéditeur ne garantit plus que ces mots sont les siens.</p><button className="soft-button" type="button" onClick={() => openApp("files")}>Chercher ce que Judy voulait protéger</button></div> : null}
       </section>
     );
   }
@@ -639,7 +753,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     if (!hasNetworkEvidence) {
       return (
         <section className="empty-app">
-          <span className="micro-label">Terminal</span>
           <h2>Shell verrouillé.</h2>
           <p>Confirmez l’anomalie réseau avant de fouiller les fichiers.</p>
           <button className="soft-button" type="button" onClick={() => openApp("network")}>
@@ -653,7 +766,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       <section className="terminal-space" aria-labelledby="terminal-title">
         <header className="app-heading">
           <div>
-            <span className="micro-label">Sandbox / lecture seule</span>
             <h2 id="terminal-title">Terminal</h2>
           </div>
         </header>
@@ -683,8 +795,9 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
           <button type="submit">Run</button>
         </form>
         <p id="terminal-hint" className="terminal-hint">
-          Commencez par <code>help</code>, puis <code>ls</code>.
+          Judy a laissé une empreinte de son archive. Comparez-la avec <code>sha256sum orion-export.zip</code>. Toutes les commandes : <code>help</code>.
         </p>
+        {hasHashEvidence ? <div className="file-preview"><p>Ce fichier n’est plus celui dont Judy avait gardé l’empreinte. Son dernier message assure pourtant que tout est normal. Quelqu’un essaie-t-il d’effacer ce qu’elle avait trouvé ?</p><button className="soft-button" type="button" onClick={() => openApp("case")}>Faire le point sur la soirée</button></div> : null}
       </section>
     );
   }
@@ -701,7 +814,6 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       <section className="files-space" aria-labelledby="files-title">
         <header className="app-heading">
           <div>
-            <span className="micro-label">Récents</span>
             <h2 id="files-title">Fichiers</h2>
           </div>
         </header>
@@ -715,6 +827,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
               type="button"
               onClick={() => {
                 if (row.name === "orion-export.zip") openApp("terminal");
+                else setSelectedFile(row.name);
               }}
             >
               <span className="file-row__icon" aria-hidden="true">□</span>
@@ -725,6 +838,13 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
           ))}
         </div>
 
+        {selectedFile ? <article className="file-preview" aria-live="polite">
+          <h3>{selectedFile}</h3>
+          <pre>{selectedFile === "auth.log"
+            ? sessionEvents.map((event) => `${event.time} ${event.device} ${event.sessionId} ${event.event}`).join("\n")
+            : runTerminalCommand(`cat ${selectedFile}`).output.join("\n")}</pre>
+        </article> : null}
+
         <p className="files-hint">
           L’archive ORION mérite une vérification d’intégrité dans le Terminal.
         </p>
@@ -734,18 +854,20 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
 
   function renderTimeline() {
     const items = [
-      { time: "21:36", title: "Dernière présence confirmée", detail: "Judy quitte Helix Systems.", active: true },
-      { time: "22:18", title: "Message externe reçu", detail: "Alerte de sécurité ORION.", active: hasPhishingEvidence },
+      { time: "20:26", title: "Le brouillon pour Max", detail: "Judy demande à Max de confirmer un départ à 20 h 30. Le message n’a pas été envoyé.", active: progress.storyClueIds?.includes("draft-max") },
+      { time: "20:31", title: "La lumière est encore allumée", detail: "Nora parle de deux versions d’ORION. La présence de Judy reste incertaine.", active: progress.storyClueIds?.includes("mail-003") },
+      { time: "21:52", title: "Message externe reçu", detail: "Une fausse alerte de sécurité tente de récupérer l’accès ORION.", active: hasPhishingEvidence },
+      { time: "22:12", title: "Le départ rapporté par Nora", detail: "Dans son mail de 22 h 24, Nora dit avoir vu Judy sortir avec son sac.", active: progress.storyClueIds?.includes("mail-departure") },
       { time: "22:44", title: "Session S-4831 réutilisée", detail: "UNKNOWN-WIN reprend le jeton.", active: hasNetworkEvidence },
       { time: "22:45", title: "Export ORION téléchargé", detail: "orion-export.zip apparaît sur le poste.", active: hasArchiveEvidence },
-      { time: "22:46", title: "Empreinte divergente", detail: "Le SHA-256 ne correspond pas à la référence.", active: hasHashEvidence },
+      { time: "22:47", title: "Un message accuse Nora", detail: "Le compte de Judy affirme qu’elle est encore au bureau. L’identité de la personne qui écrit n’est pas établie.", active: progress.storyClueIds?.includes("mail-sent") },
+      { time: "Maintenant", title: "Empreinte divergente", detail: "Max constate que l’archive diffère de la référence. L’heure de sa modification est inconnue.", active: hasHashEvidence },
     ];
 
     return (
       <section className="timeline-space" aria-labelledby="timeline-title">
         <header className="app-heading">
           <div>
-            <span className="micro-label">Reconstruction</span>
             <h2 id="timeline-title">Timeline</h2>
           </div>
         </header>
@@ -784,6 +906,8 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
     return (
       <div
         className="app-window draggable-window"
+        data-maximized={maximizedApp === app}
+        data-foreground={activeApp === app}
         data-app={app}
         key={app}
         ref={(node) => { windowRefs.current[app] = node; }}
@@ -809,42 +933,50 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
               aria-label={`Fermer ${meta.label}`}
               onPointerDown={(event) => event.stopPropagation()}
               onClick={() => closeApp(app)}
-            />
+            >×</button>
             <button
               type="button"
               aria-label={`Réduire ${meta.label}`}
               onPointerDown={(event) => event.stopPropagation()}
               onClick={() => minimizeApp(app)}
-            />
-            <span aria-hidden="true" />
+            >−</button>
+            <button type="button" aria-label={`${maximizedApp === app ? "Restaurer" : "Agrandir"} ${meta.label}`}
+              aria-pressed={maximizedApp === app}
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={() => setMaximizedApp((current) => current === app ? null : app)}>□</button>
           </div>
           <div className="app-window__identity">
             <span>{meta.glyph}</span>
             <strong>{meta.label}</strong>
           </div>
-          <span className="app-window__code">{meta.code}</span>
+          <span className="app-window__code">~/judy/{app}</span>
         </header>
-        <div className="app-window__body">{renderApp(app)}</div>
+        <div className="app-window__body">
+          {renderApp(app)}
+        </div>
       </div>
     );
   }
 
   return (
-    <main className="judy-os" id="main-content">
+    <main className="judy-os" id="main-content" tabIndex={-1} aria-label={`Bureau forensic, dossier ${caseId}`}>
       <p className="sr-only" aria-live="polite">{announcement}</p>
+      {announcement && /preuves|Phishing ciblé confirmé|Empreinte divergente/.test(announcement) ? <div key={announcement} className="evidence-notice" aria-hidden="true">{announcement}</div> : null}
+      {saveFailed ? <p className="save-warning" role="status">Sauvegarde locale indisponible. Gardez cet onglet ouvert pour conserver votre progression.</p> : null}
 
       <img className="judy-os__wallpaper" src={judyWallpaper} alt="" aria-hidden="true" />
       <div className="judy-os__veil" aria-hidden="true" />
 
       <header className="os-menubar">
         <div className="os-menubar__left">
-          <span className="os-mark" aria-hidden="true">TZ</span>
-          <strong>JUDY-LAPTOP</strong>
+          <img className="trace-logo" src="/trace-mark.svg" alt="" />
+          <strong className="system-brand">TRACE // ZERO</strong>
         </div>
         <div className="os-menubar__center">
-          <span>{caseComplete ? "trace complete" : "case 001"}</span>
+          <time>{clock}</time>
         </div>
         <div className="os-menubar__right">
+          <PlayerGuide />
           <button className="layout-reset" type="button" onClick={resetDesktopLayout}>
             Ranger
           </button>
@@ -854,12 +986,13 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
             aria-pressed={notesOpen}
             onClick={() => {
               setNotesOpen((open) => !open);
-              if (!notesOpen) focusWindow("notes");
+              if (!notesOpen) { setNotebookTab("leads"); focusWindow("notes"); }
             }}
           >
             Carnet {progress.discoveredEvidenceIds.length}/6
           </button>
-          <span className="os-status-dot" aria-hidden="true" />
+          <SystemStatus />
+          <AudioControl />
         </div>
       </header>
 
@@ -889,8 +1022,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                 onKeyDown={(event) => moveWindowWithKeyboard("notes", event)}
               >
                 <div>
-                  <span className="micro-label">Mémoire du dossier</span>
-                  <strong id="notebook-title">Carnet</strong>
+                  <strong id="notebook-title">Carnet de Max</strong>
                 </div>
                 <button
                   type="button"
@@ -903,6 +1035,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
               </header>
 
               <div className="notes-tabs" role="tablist" aria-label="Carnet">
+                <button aria-selected={notebookTab === "leads"} onClick={() => setNotebookTab("leads")} role="tab" type="button">Pistes</button>
                 <button
                   aria-selected={notebookTab === "evidence"}
                   onClick={() => setNotebookTab("evidence")}
@@ -921,9 +1054,23 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                 </button>
               </div>
 
-              {notebookTab === "evidence" ? (
+              {notebookTab === "leads" ? (
+                <div className="notes-list" role="tabpanel" aria-label="Pistes">
+                  <section className="investigation-lead" aria-label="Piste en cours">
+                    <strong>{lead.question}</strong>
+                    <div className="story-actions">
+                      <button className="soft-button soft-button--small" type="button" onClick={followLead}>{lead.action}</button>
+                      <details><summary>Besoin d’un indice ?</summary><p>{lead.hint}</p></details>
+                    </div>
+                  </section>
+                </div>
+              ) : notebookTab === "evidence" ? (
                 <div className="notes-list" role="tabpanel">
-                  {progress.discoveredEvidenceIds.length === 0 ? (
+                  {(progress.storyClueIds ?? []).map((id) => {
+                    const clue = storyClues[id as StoryClueId];
+                    return clue ? <article className="note-card" key={id}><strong>{clue.title}</strong><p>{id === "mail-sent" && notebook.sentMessage ? notebook.sentMessage : clue.detail}</p><button className="soft-button soft-button--small" type="button" onClick={() => { setNotesOpen(false); selectMessage(id); }}>Relire le message</button></article> : null;
+                  })}
+                  {progress.discoveredEvidenceIds.length === 0 && !progress.storyClueIds?.length ? (
                     <p className="notes-empty">Aucune preuve pour l’instant.</p>
                   ) : (
                     progress.discoveredEvidenceIds.map((id) => {
@@ -934,6 +1081,13 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                           <span>{evidence.id}</span>
                           <strong>{evidence.title}</strong>
                           <p>{evidence.description}</p>
+                          <button className="soft-button soft-button--small" type="button" onClick={() => {
+                            setNotesOpen(false);
+                            if (id === "E01" || id === "E02") selectMessage(phishingEmailId);
+                            else if (id === "E03" || id === "E04") openApp("network");
+                            else if (id === "E05") openApp("files");
+                            else { setTerminalInput("sha256sum orion-export.zip"); openApp("terminal"); }
+                          }}>{id === "E06" ? "Vérifier à nouveau" : "Revoir la source"}</button>
                         </article>
                       );
                     })
@@ -942,9 +1096,9 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
               ) : (
                 <div className="notes-list" role="tabpanel">
                   <article className="note-card note-card--hypothesis">
-                    <span>H01</span>
                     <strong>Phishing ciblé</strong>
-                    <p>Le message externe a servi à capturer la session ORION de Judy.</p>
+                    <p>{notebook.hypothesis}</p>
+                    {notebook.missing.length ? <p>À vérifier : {notebook.missing.join(" et ").toLowerCase()}.</p> : null}
                     <button
                       className="soft-button soft-button--small"
                       disabled={!hasPhishingEvidence || hypothesisValidated}
@@ -954,6 +1108,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
                       {hypothesisValidated ? "Hypothèse validée" : "Valider la conclusion"}
                     </button>
                   </article>
+                  {notebook.conclusions.length ? <article className="note-card"><strong>Ce que je peux en déduire</strong>{notebook.conclusions.map((conclusion) => <p key={conclusion}>{conclusion}</p>)}</article> : null}
                 </div>
               )}
             </aside>
@@ -962,6 +1117,7 @@ export function InvestigationDesktop({ caseId }: { caseId: string }) {
       </section>
 
       <nav className="os-dock" aria-label="Applications de Judy">
+        <Link className="dock-home" href="/" aria-label="Accueil Trace Zero"><img className="trace-logo" src="/trace-mark.svg" alt="" /></Link>
         {apps.map((app) => {
           const isOpen = openApps.includes(app.id) && !minimizedApps.includes(app.id);
           return (

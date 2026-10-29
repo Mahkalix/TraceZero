@@ -1,0 +1,72 @@
+@use "tokens" as *;
+
+body { color: $station-text; background: $station-bg; }
+.entry-os, .judy-os { color: $station-text; background: $station-bg url('/forensic-workstation.webp') center / cover fixed; }
+.entry-os__wallpaper, .judy-os__wallpaper { position: absolute; width: 100%; height: 100%; min-height: 100svh; filter: saturate(.55) brightness(.8); }
+.entry-os__veil, .judy-os__veil {
+  position: absolute;
+  background: linear-gradient(90deg, $wallpaper-reading-shade, $wallpaper-shade);
+}
+.entry-menubar, .os-menubar, .os-dock, .app-window, .notes-inspector, .entry-guide {
+  background: linear-gradient(145deg, $station-glass-highlight, transparent 50%), $station-glass; border-color: $station-border;
+  backdrop-filter: blur($station-blur) saturate(.65); box-shadow: $station-shadow;
+}
+.entry-guide, .app-window, .notes-inspector { border-radius: $station-radius; }
+.app-window__chrome, .notes-inspector__header, .guide-chrome { background: $station-glass-highlight; border-color: $station-border; }
+.app-window__body, .entry-guide__body { background: $station-glass-body; }
+.terminal-space { background: $station-reading; }
+.mail-space__reader { background: $station-mail-glass; }
+.analysis-sheet { background: linear-gradient(135deg, $station-glass-highlight, transparent 65%), $station-analysis-glass; border-color: $station-border; box-shadow: inset 0 1px 0 $station-reflection; }
+.analysis-choice { background: $station-choice-glass; color: $station-text; border: 1px solid transparent; }
+.analysis-choice:has(input:checked) { background: $station-choice-selected; border-color: $station-border; color: $station-text; }
+.analysis-choice input { accent-color: $color-accent; }
+.analysis-sheet > header > span { color: $station-muted; }
+.analysis-hint { color: $station-muted; font-size: .75rem; line-height: 1.6; }
+.analysis-feedback { display: grid; gap: $space-2; margin: $space-4 0 0; padding: $space-4; border: 1px solid $station-border; border-left: 3px solid $color-accent; border-radius: $radius-lg; color: $station-text; background: $station-mail-glass; font-size: .82rem; line-height: 1.6; }
+.analysis-feedback strong { color: $color-accent; font-size: .75rem; }
+.analysis-feedback ul { margin: 0; padding-left: $space-5; display: grid; gap: $space-2; }
+.case-home__content { background: transparent; }
+.app-window[data-foreground="false"] { border-color: $station-reflection; }
+.app-window[data-foreground="true"] { border-color: rgba($station-text,.3); }
+.entry-card h1, .entry-guide h2, .app-window strong, .case-home h2 { color: $station-text; }
+.entry-card p, .entry-card .entry-explanation, .entry-card small, .entry-guide p, .entry-footer, .system-host,
+.case-home p, .mail-space__body, .mail-space__meta, .case-home .micro-label, .case-home__meta span,
+.layout-reset, .notes-toggle, .desktop-identity small, .guide-chrome, .case-avatar small, .case-avatar em { color: $station-muted; }
+.entry-eyebrow, .entry-guide li > span, .desktop-identity > span, .case-avatar > span, .status-pill,
+.note-card > span, .terminal-command > span { color: $color-accent; }
+.entry-button, .soft-button { background: $color-accent; color: $station-on-accent; border-color: $color-accent; }
+.entry-button:hover, .soft-button:hover { background: $color-accent-strong; color: $station-on-accent; }
+.os-status-dot, .dock-app[data-open="true"]::after, .timeline-list li[data-active="true"]::after { background: $color-accent; box-shadow: none; }
+.case-avatar { background: $station-chrome; border-color: $station-border; }
+.case-avatar > span { background: $station-surface; border-color: $station-border; }
+.investigation-next { border-color: $color-accent; }
+.window-controls button { color: $station-text; background: $station-surface; }
+.window-controls button:hover { background: $color-accent !important; color: $station-on-accent; }
+button:focus-visible, a:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline-color: $color-accent; box-shadow: 0 0 0 .2rem rgba($color-accent,.16); }
+@supports not (backdrop-filter: blur($blur-93)) {
+  .entry-menubar, .os-menubar, .os-dock, .app-window, .notes-inspector, .entry-guide,
+  .app-window__chrome, .notes-inspector__header, .guide-chrome { background: $station-chrome; }
+  .mail-space__reader, .analysis-sheet { background: $station-surface; }
+}
+
+.station-content { position: relative; --boot-duration-ms: #{$boot-duration-ms}; --boot-reduced-ms: #{$boot-reduced-ms}; }
+.station-content[data-boot-phase="checking"] { opacity: 0; }
+.station-content[data-boot-phase="playing"] .app-window,
+.station-content[data-boot-phase="playing"] .os-menubar,
+.station-content[data-boot-phase="playing"] .os-dock { backdrop-filter: none; }
+.boot-replay { position: fixed; bottom: $space-3; right: $space-4; z-index: 130; padding: $space-2; border: 1px solid $station-border; border-radius: $radius-sm; background: $station-chrome; color: $station-muted; font: .65rem var(--font-mono), monospace; cursor: pointer; }
+.station-boot { position: fixed; inset: 0; z-index: 1200; background: $station-bg; color: $station-text; pointer-events: none; }
+.boot-skip { position: absolute; z-index: 2; top: $space-6; right: $space-6; padding: $space-3 $space-4; border: 1px solid $station-border; border-radius: $radius-sm; background: $station-chrome; color: $station-text; cursor: pointer; pointer-events: auto; }
+.boot-skip span { color: $station-muted; margin-left: $space-4; font: .7rem var(--font-mono), monospace; }
+.boot-scene { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; }
+.boot-static { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; color: $color-accent; font: 1rem var(--font-mono), monospace; }
+.station-boot[data-reduced="true"] .boot-scene { display: none; }
+.station-boot[data-reduced="true"] { animation: boot-materialize $motion-reduced $motion-ease both; }
+.evidence-notice { position: fixed; top: 4.5rem; right: $space-5; max-width: min(28rem, calc(100% - 3rem)); z-index: 200; pointer-events: none; padding: $space-4; border: 1px solid $color-accent; border-radius: $radius-sm; background: $station-surface; color: $color-accent; font: .75rem var(--font-mono), monospace; animation: evidence-moment $timing-92 $motion-ease both; }
+@keyframes boot-materialize { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes evidence-moment { 0% { opacity: 0; transform: translateX(-3px); } 12% { opacity: 1; transform: translateX(2px); } 24%, 80% { opacity: 1; transform: translateX(0); } 100% { opacity: 0; transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .boot-scene, .evidence-notice { display: none !important; }
+  .station-boot *, .station-boot { animation: none !important; }
+}
+@media (max-width: 58rem) { .boot-replay { position: absolute; bottom: $space-1; right: $space-3; } }

@@ -10,7 +10,7 @@
   padding: 0.72rem 1rem;
   border: 1px solid $line-strong;
   border-radius: $radius-xs;
-  color: #171a18;
+  color: $material-10;
   background: $color-accent;
   font-family: var(--font-mono), monospace;
   font-size: 0.75rem;
@@ -20,9 +20,9 @@
   text-transform: uppercase;
   cursor: pointer;
   transition:
-    background-color 140ms ease,
-    border-color 140ms ease,
-    color 140ms ease;
+    background-color $timing-13 ease,
+    border-color $timing-13 ease,
+    color $timing-13 ease;
 
   &:hover:not(:disabled) {
     border-color: $color-accent-strong;
@@ -38,7 +38,7 @@
 }
 
 .crt-action span {
-  color: #303531;
+  color: $material-11;
   opacity: 0.7;
 }
 
@@ -81,7 +81,7 @@
   border-bottom: 1px solid $line-strong;
   color: $color-text-muted;
   background:
-    linear-gradient(90deg, rgb(184 201 187 / 4%), transparent 35%),
+    linear-gradient(90deg, $material-12, transparent 35%),
     $color-panel;
   font-family: var(--font-mono), monospace;
   font-size: 0.65rem;
